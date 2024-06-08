@@ -36,5 +36,38 @@ const createPost = async (req, res) => {
     }
 };
 
+const getPosts = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if(!post){
+            return res.status(400).json({ error: "Post does not exist" });
+        }
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in getPosts ", err.message);
+    }
+}
 
-export { createPost };
+const deletePosts = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if(!post){
+            return res.status(400).json({ error: "Post does not exist" });
+        }   
+
+        if(post.postedBy.toString() !== req.user._id.toString()){
+            return res.status(400).json({ error: "Unauthorized to delete post" });
+        }
+
+        await Post.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: "Post deleted successfully" });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in deletePosts ", err.message);
+    }
+}
+
+
+export { createPost, getPosts, deletePosts };
