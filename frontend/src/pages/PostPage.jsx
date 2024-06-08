@@ -1,5 +1,5 @@
-import { Avatar, AvatarGroup, Box, Container, Divider, Flex, Image, Input, Text } from "@chakra-ui/react"
-import UserPost from "../components/UserPost";
+import { Avatar, AvatarGroup, Box, Divider, Flex, Image, Input, Text } from "@chakra-ui/react"
+// import UserPost from "../components/UserPost";
 import { Link } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
 import Actions from "../components/Actions";
