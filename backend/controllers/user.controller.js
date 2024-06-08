@@ -2,6 +2,21 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateTokensAndSetCookies from "../utils/helpers/generateTokensAndSetCookies.js";
 
+const getUserProfile = async (req, res) => {
+    const {username} = req.params;
+    try {
+        const user = await User.findOne({ username}).select("-password");
+        if(!user){
+            return res.status(400).json({ error: "User does not exist" });
+        }
+        res.status(200).json(user);        
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in get user profile ", err.message);
+    }
+};
+
+
 const signupUser = async (req, res) => {
     try {
         const { name, username, email, password } = req.body;
@@ -180,4 +195,5 @@ const updateProfile = async (req, res) => {
     }
 }
 
-export { signupUser, loginUser, logoutUser, addRemoveFriend, updateProfile };
+
+export { signupUser, loginUser, logoutUser, addRemoveFriend, updateProfile, getUserProfile };
