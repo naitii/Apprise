@@ -75,7 +75,7 @@ const UserHeader = () => {
         {/* 4th row */}
         <Flex justifyContent={"center"} w={"full"} gap={20}>
           <Text fontSize={["md", "xl"]} textAlign={"center"}>
-            Posts: 3
+            Posts: 4
           </Text>
           <Text fontSize={["md", "xl"]} textAlign={"center"}>
             Friends: 0
