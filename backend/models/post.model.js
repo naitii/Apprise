@@ -5,12 +5,12 @@ const postSchema = mongoose.Schema({
     postedBy:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        reqquired: true,
+        required: true,
     },
     caption: {
         type: String,
         required: true,
-        maxLength: 500,
+        maxLength: 250,
     },
     img: {
         type: String,
