@@ -1,49 +1,58 @@
 import { text } from "express";
 import mongoose from "mongoose";
 
-const postSchema = mongoose.Schema({
-    postedBy:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+const postSchema = mongoose.Schema(
+  {
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     caption: {
-        type: String,
-        required: true,
-        maxLength: 250,
+      type: String,
+      required: true,
+      maxLength: 250,
     },
     img: {
-        type: String,
+      type: String,
     },
     likes: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'User',
-        default: [],
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
     },
-    comments: [{
-        userId:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
+    comments: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
         },
-        text:{
-            type: String,
-            required: true,
+        text: {
+          type: String,
+          required: true,
         },
         userProfilePic: {
-            type: String,
+          type: String,
         },
         username: {
-            type: String,
-            required: true,
+          type: String,
+          required: true,
         },
         createdAt: {
-            type: Date,
-            default: Date.now,
+          type: Date,
+          default: Date.now,
         },
-    }]
-
-}, {timestamps: true});
+        likes: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: "User",
+          default: [],
+        },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 const Post = mongoose.model("Post", postSchema);
 

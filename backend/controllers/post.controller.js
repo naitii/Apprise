@@ -127,4 +127,88 @@ const commentToPost = async (req, res) => {
     }
 }
 
-export { createPost, getPosts, deletePosts, likeUnlikePost, commentToPost };
+const getFeed = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).json({ error: "User does not exist" });
+        }
+
+        const friends = user.friends;
+
+        const feed = await Post.find({postedBy: {$in: friends}}).sort({createdAt: -1});
+
+        res.status(200).json({message: "Feed fetched successfully", feed});
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in getFeed ", err.message); 
+    }
+}
+
+const deleteComment = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const commentId = req.params.commentId;
+        const post = await Post.findOne({"comments._id": commentId});
+        if(!post){
+            return res.status(400).json({ error: "No such post exist" });
+        }
+        const comment = post.comments.find(comment => comment._id.toString() === commentId);
+        if(!comment){
+            return res.status(400).json({ error: "No such comment exist" });
+        }
+        if(comment.userId.toString() !== userId.toString()){
+            return res.status(400).json({ error: "Unauthorized to delete comment" });
+        }
+        post.comments = await post.comments.filter(comment => comment._id.toString() !== commentId);
+        await post.save();
+        res.status(200).json({ message: "Comment deleted successfully", post});
+        
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in deleteComment ", err.message);        
+    }
+}
+
+const likeUnlikeComment = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const commentId = req.params.commentId;
+        const post = await Post.findOne({"comments._id": commentId});
+        if(!post){
+            return res.status(400).json({ error: "No such post exist" });
+        }
+        const comment = post.comments.find(comment => comment._id.toString() === commentId);
+        if(!comment){
+            return res.status(400).json({ error: "No such comment exist" });
+        }
+        const isLiked = comment.likes.includes(userId);
+
+        if(isLiked)
+        {
+            await Post.updateOne({"comments._id": commentId}, {$pull: {"comments.$.likes": userId}});
+            res.status(200).json({ message: "Comment unliked successfully", post});
+        }
+        else{
+            await Post.updateOne({"comments._id": commentId}, {$push: {"comments.$.likes": userId}});
+            res.status(200).json({ message: "Comment liked successfully", post});
+        }
+        await post.save();
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in likeUnlikeComment ", err.message);
+    }
+}
+
+export {
+  createPost,
+  getPosts,
+  deletePosts,
+  likeUnlikePost,
+  commentToPost,
+  getFeed,
+  deleteComment,
+  likeUnlikeComment,
+};
