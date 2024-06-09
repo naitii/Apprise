@@ -69,5 +69,62 @@ const deletePosts = async (req, res) => {
     }
 }
 
+const likeUnlikePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if(!post){
+            return res.status(400).json({ error: "Post does not exist" });
+        }
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(400).json({ error: "Please Login to Like the Post" });
+        }
+        const isLiked = post.likes.includes(req.user._id);
 
-export { createPost, getPosts, deletePosts };
+        if(isLiked){
+            await Post.updateOne({_id: req.params.id}, {$pull: {likes: req.user._id}});
+            res.status(200).json({ message: "Post unliked successfully" });
+        }
+        else{
+            await Post.updateOne({_id: req.params.id}, {$push: {likes: req.user._id}});
+            res.status(200).json({ message: "Post liked successfully" });
+        }
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in likePost ", err.message);
+    }
+}
+
+const commentToPost = async (req, res) => {
+    try {
+        const {text} = req.body;
+        const {id} = req.params;  //post Id
+        const userId = req.user._id;
+        const userProfilePic = req.user.profilePic;
+        const username = req.user.username;
+        if(!text){
+            return res.status(400).json({ error: "Please fill all the fields" });
+        }
+        const post = await Post.findById(id);
+        if(!post){
+            return res.status(400).json({ error: "Post does not exist" });
+        }
+        const newComment = {
+          userId,
+          text,
+          userProfilePic,
+          username,
+        };
+        post.comments.push(newComment);
+
+        await post.save();
+        res.status(200).json({ message: "Comment added successfully", post});
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in commentToPost ", err.message);
+    }
+}
+
+export { createPost, getPosts, deletePosts, likeUnlikePost, commentToPost };
