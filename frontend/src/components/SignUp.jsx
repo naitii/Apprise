@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import authScreenAtom from "../atoms/auth.atom";
 import { useSetRecoilState } from "recoil";
+import userAtom from "../atoms/user.atom";
 // import { FaLock } from "react-icons/fa";
 
 // const CFaUserAlt = chakra(FaUserAlt);
@@ -28,6 +29,7 @@ const SignUp = () => {
   const handleShowClick = () => setShowPassword(!showPassword);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
     const toast = useToast();
+    const setUser = useSetRecoilState(userAtom)
   const [input, setInput] = useState({
     name: "",
     username: "",
@@ -58,7 +60,7 @@ const SignUp = () => {
         }
 
         localStorage.setItem("user-apprise", JSON.stringify(data));
-        
+        setUser(data);
 
     } catch (err) {
         console.error("error in signing up: ", err)

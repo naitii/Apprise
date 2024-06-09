@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateTokensAndSetCookies from "../utils/helpers/generateTokensAndSetCookies.js";
+import {v2 as cloudinary} from "cloudinary";
 
 const getUserProfile = async (req, res) => {
     const {username} = req.params;
@@ -45,6 +46,8 @@ const signupUser = async (req, res) => {
             name,
             username,
             email,
+            bio: "",
+            profilePic: "",
             password: hashedPassword,
         });
         await newUser.save();
@@ -88,6 +91,8 @@ const loginUser = async (req, res) => {
             res.status(200).json({
                 _id: user._id,
                 name: user.name,
+                profilePic: user.profilePic,
+                bio: user.bio,
                 username: user.username,
                 email: user.email,
             });
@@ -148,14 +153,17 @@ const addRemoveFriend = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-    const {name, username, email, password, profilePic, bio} = req.body;
+    const {name, username, email, password, bio} = req.body;
+    let { profilePic } = req.body;
     const userId = req.user._id; 
+    
     try {
         let user = await User.findById(userId);
         if(!user){
             return res.status(400).json({ error: "User does not exist" });
         }
-        if(req.params.id !== userId){
+        
+        if(req.params.id !== userId.toString()){
             return res.status(400).json({ error: "You can only update your profile" });
         }
         if(password){
@@ -163,11 +171,17 @@ const updateProfile = async (req, res) => {
             const hashedPassword = await bcrypt.hash(password, salt);
             user.password = hashedPassword;
         }
-
+        if(profilePic){
+            if(user.profilePic){
+                await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]); 
+            }
+            const uploadedRes = await cloudinary.uploader.upload(profilePic);
+            profilePic = uploadedRes.secure_url;
+        }
         user.name = name || user.name;
         if(username){
             const userExists = await User.findOne({ username: username });  
-            if(userExists){
+            if(userExists && userExists._id.toString() !== userId.toString()){
                 return res.status(400).json({ error: "Username Taken" });
             }
             else{
@@ -176,7 +190,7 @@ const updateProfile = async (req, res) => {
         }
         if(email){
             const userExists = await User.findOne({ email: email });
-            if(userExists){
+            if(userExists && userExists._id.toString() !== userId.toString()){
                 return res.status(400).json({ error: "Email Taken" });
             }
             else{
@@ -189,7 +203,6 @@ const updateProfile = async (req, res) => {
         user = await user.save();
 
         res.status(200).json({
-            message: "Profile updated successfully",
             user
         });
 

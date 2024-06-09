@@ -9,6 +9,6 @@ router.post("/signup", signupUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/addfriend/:id",protectRoute, addRemoveFriend);
-router.post("/updateprofile/:id", protectRoute, updateProfile);
+router.put("/updateprofile/:id", protectRoute, updateProfile);
 
 export default router;
