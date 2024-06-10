@@ -59,7 +59,8 @@ const signupUser = async (req, res) => {
                 name: newUser.name,
                 username: newUser.username,
                 email: newUser.email,
-
+                bio: "",
+                profilePic: "",
             });
         }
         else{
@@ -121,7 +122,6 @@ const addRemoveFriend = async (req, res) => {
         const { id } = await req.params;
         const userToModify = await User.findById(id);
         const weAsUser = await User.findById(req.user?._id);
-        console.log("friendId", weAsUser)
         
         if(!userToModify || !weAsUser){
             return res.status(400).json({ error: "User does not exist" });
@@ -164,7 +164,7 @@ const updateProfile = async (req, res) => {
         }
         
         if(req.params.id !== userId.toString()){
-            return res.status(400).json({ error: "You can only update your profile" });
+            return res.status(400).json({ error: "Some Error Occurred. Please try again" });
         }
         if(password){
             const salt = await bcrypt.genSalt(10);
@@ -201,10 +201,10 @@ const updateProfile = async (req, res) => {
         user.bio = bio || user.bio;
 
         user = await user.save();
-
-        res.status(200).json({
+        user.password = undefined;
+        res.status(200).json(
             user
-        });
+        );
 
     } catch (err) {
         res.status(500).json({ error: err.message });

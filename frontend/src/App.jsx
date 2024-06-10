@@ -21,18 +21,18 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={user[0] ? <HomePage /> : <Navigate to="/auth" />}
+            element={user[0] ? <HomePage /> : <Navigate to="/auth/0" />}
           ></Route>
           <Route
-            path="/update"
-            element={user[0] ? <UpdateProfile /> : <Navigate to="/auth" />}
+            path="/profile/update"
+            element={user[0] ? <UpdateProfile /> : <Navigate to="/auth/0" />}
           ></Route>
           <Route
-            path="/auth"
+            path="/auth/0"
             element={!user[0] ? <AuthPage /> : <Navigate to="/" />}
           ></Route>
-          <Route path="/signup" element={<SignUp />}></Route>
-          <Route path="/:username" element={<UserPage />}></Route>
+          <Route path="/auth/signup" element={<SignUp />}></Route>
+          <Route path="/profile/:username" element={<UserPage />}></Route>
           <Route path="/:username/post/:pid" element={<PostPage />}></Route>
         </Routes>
         {user && <LogoutBtn />}
