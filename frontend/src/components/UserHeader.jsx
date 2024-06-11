@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Flex, Menu, MenuButton, MenuItem, MenuList, Portal, Text, VStack, useToast } from "@chakra-ui/react"
+import { Avatar, Box, Button, Flex, Menu, MenuButton, MenuItem, MenuList, Portal, Text, VStack, useToast } from "@chakra-ui/react"
 import {   MessageSquareMore } from "lucide-react";
 import {CgMoreO} from "react-icons/cg";
 import {  useRecoilValue } from "recoil";
@@ -53,9 +53,9 @@ const UserHeader = ({user}) => {
     })
   }
   return (
-    <Container maxW="700px">
-      <VStack gap={4} alignItems={"center"}>
-        <Flex justifyContent={"space-around"} w={"full"} gap={4}>
+    // <Container>
+      <VStack gap={4} alignItems={"center"} mt={8}>
+        <Flex justifyContent={"space-around"} w={["100%", "70%"]} gap={2}>
           <Box>
             <Avatar
               border={"1px solid black"}
@@ -93,7 +93,7 @@ const UserHeader = ({user}) => {
 
         <Flex gap={4} w={"full"} justifyContent={"center"} mt={6} mb={3}>
           {currentUser._id.toString() === user._id.toString() ? (
-            <Link to="/profile/update">
+            <Link to="/update">
               <Button colorScheme={"blue"} w={"100%"}>
                 Update Profile
               </Button>
@@ -159,7 +159,7 @@ const UserHeader = ({user}) => {
           </Flex>
         </Flex>
       </VStack>
-    </Container>
+    // </Container>
   );
 }
 

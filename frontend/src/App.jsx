@@ -1,4 +1,4 @@
-import { Container } from "@chakra-ui/react"
+// import { Container } from "@chakra-ui/react"
 import { Navigate, Route, Routes } from "react-router-dom"
 import UserPage from "./pages/UserPage"
 import PostPage from "./pages/PostPage";
@@ -10,33 +10,60 @@ import { useRecoilState } from "recoil";
 import userAtom from "./atoms/user.atom";
 import LogoutBtn from "./components/LogoutBtn";
 import UpdateProfile from "./pages/UpdateProfile";
+import CreatePost from "./components/CreatePost";
+import SidebarWithHeader from "./components/SideBarWithHeader";
 
 function App() {
 
   const user = useRecoilState(userAtom);
   return (
     <>
-      <Header />
-      <Container maxW="700px">
-        <Routes>
-          <Route
-            path="/"
-            element={user[0] ? <HomePage /> : <Navigate to="/auth/0" />}
-          ></Route>
-          <Route
-            path="/profile/update"
-            element={user[0] ? <UpdateProfile /> : <Navigate to="/auth/0" />}
-          ></Route>
-          <Route
-            path="/auth/0"
-            element={!user[0] ? <AuthPage /> : <Navigate to="/" />}
-          ></Route>
-          <Route path="/auth/signup" element={<SignUp />}></Route>
-          <Route path="/profile/:username" element={<UserPage />}></Route>
-          <Route path="/:username/post/:pid" element={<PostPage />}></Route>
-        </Routes>
-        {user && <LogoutBtn />}
-      </Container>
+      {/* <Container maxW="700px"> */}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user[0] ? (
+              <SidebarWithHeader children={<HomePage />} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/update"
+          element={
+            user[0] ? (
+              <SidebarWithHeader children={<UpdateProfile />} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/auth"
+          element={
+            !user[0] ? (
+              <>
+                <Header />
+                 <AuthPage />
+              </>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        ></Route>
+        <Route path="/signup" element={<SignUp />}></Route>
+        <Route
+          path="/profile/:username"
+          element={<SidebarWithHeader children={<UserPage />} />}
+        ></Route>
+        <Route
+          path="/:username/post/:pid"
+          element={<SidebarWithHeader children={<PostPage />} />}
+        ></Route>
+      </Routes>
+      {/* </Container> */}
     </>
   );
 }

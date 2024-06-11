@@ -1,6 +1,7 @@
-import { Button, useToast } from "@chakra-ui/react"
+import { Box, Text, useToast } from "@chakra-ui/react"
 import { useSetRecoilState } from "recoil";
 import userAtom from "../atoms/user.atom";
+import { TbLogout2 } from "react-icons/tb";
 
 
 const LogoutBtn = () => {
@@ -34,12 +35,13 @@ const LogoutBtn = () => {
         }
     }
   return (
-    <Button 
-        // position={"fixed"}
-        size={"sm"}
-        onClick={handleLogout}
-    >Log Out</Button>
-  )
+    <>
+      <Box as={TbLogout2} w={6} h={6} />
+      <Text ml={5} mr={5} fontSize={"l"} onClick={handleLogout}>
+        Log Out
+      </Text>
+    </>
+  );
 }
 
 export default LogoutBtn

@@ -1,4 +1,6 @@
 import { Flex, Image, useColorMode } from "@chakra-ui/react"
+import { FaRegSun, FaRegMoon } from "react-icons/fa";
+
 
 const Header = () => {
     const {colorMode, toggleColorMode } = useColorMode();
@@ -32,13 +34,7 @@ const Header = () => {
             : "/DarkLogo/logo-no-background.svg"
         }
       />
-      <Image
-        filter={"brightness(0.6)"}
-        cursor={"pointer"}
-        onClick={toggleColorMode}
-        width={"40px"}
-        src={colorMode === "light" ? "/btns/moon.png" : "/btns/sun.png"}
-      />
+      {colorMode === "light" ? (<FaRegMoon size={28} cursor={"pointer"} onClick={toggleColorMode} />):(<FaRegSun size={28} cursor={"pointer"} onClick={toggleColorMode} />) }
     </Flex>
   );
 }
