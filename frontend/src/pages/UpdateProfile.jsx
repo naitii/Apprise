@@ -33,10 +33,11 @@ const UpdateProfile = () =>{
     const fileRef = useRef(null);
     
     const {handleImg, imgUrl} = usePreviewImg();
+    const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-        
+        setLoading(true);
         try {
             const userID = await user._id;
             const res = await fetch(`/api/users/updateprofile/${userID}`, {
@@ -65,6 +66,8 @@ const UpdateProfile = () =>{
         } catch (err) {
             showToast("Error", "An error occurred", "error");
             console.error("error in updating profile: ", err);
+        }finally{
+            setLoading(false);
         }
     }
     const handleCancel = () => {
@@ -167,6 +170,7 @@ const UpdateProfile = () =>{
             _hover={{
               bg: "blue.500",
             }}
+            isLoading={loading}
           >
             Submit
           </Button>

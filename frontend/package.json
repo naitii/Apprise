@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.11.5",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.390.0",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",

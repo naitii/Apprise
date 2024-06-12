@@ -1,13 +1,10 @@
 import { Avatar, AvatarGroup, Box, Container, Flex, Image, Input, Text } from '@chakra-ui/react'
 import {Link} from 'react-router-dom'
 import { Ellipsis } from "lucide-react";
-import Actions from './Actions';
-import { useState } from 'react';
 // import {CgMoreO} from 'react-icons/cg'
 
 const UserPost = ({postId, postImg, postTitle, postTime, likes, comments}) => {
-    // const { colorMode, toggleColorMode } = useColorMode();
-    const [liked, setLiked] = useState(false);
+    
   return (
     <Link to={`/pingpo/post/${postId}`}>
       <Container mt={3} mb={10} border="1px solid #1e1e1e" p={4}>
@@ -40,7 +37,7 @@ const UserPost = ({postId, postImg, postTitle, postTime, likes, comments}) => {
             minHeight={"380px"}
           />
         )}
-        <Actions liked={liked} setLiked={setLiked} />
+        {/* <Actions liked={liked} setLiked={setLiked} /> */}
         <Flex>
           <AvatarGroup
             size="xs"

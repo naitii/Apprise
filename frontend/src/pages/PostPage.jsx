@@ -3,16 +3,33 @@ import { Avatar, AvatarGroup, Box, Divider, Flex, Image, Input, Text } from "@ch
 import { Link } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
 import Actions from "../components/Actions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Comment from "../components/Comment";
+import useShowToast from "../hooks/showToast";
 
 const PostPage = () => {
+  const [post, setPosts] = useState(null);
+  const showToast = useShowToast();
   let postId=4
   let postImg="/po-post-3.png"
   let postTitle="Balancing out my workout with dumpling deliciousness!"
   let postTime="2 hours ago"
   let likes=5
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    const getPost=async ()=>{
+      try {
+        const res = await fetch(`/api/posts/${postId}`);
+      } catch (err) {
+        showToast("Error", err.message, "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+  })
+  
   return (
     <>
       <Link to={`/pingpo/post/${postId}`}>

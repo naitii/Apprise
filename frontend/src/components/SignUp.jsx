@@ -25,6 +25,7 @@ import userAtom from "../atoms/user.atom";
 // const CFaLock = chakra(FaLock);
 
 const SignUp = () => {
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const handleShowClick = () => setShowPassword(!showPassword);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
@@ -38,7 +39,7 @@ const SignUp = () => {
   })
   const handleSignUp = async (e) => {
     e.preventDefault();
-    // console.log(typeof(input.password));
+    setLoading(true);
     try {
         const res = await fetch("/api/users/signup",{
             method: "POST",
@@ -64,6 +65,9 @@ const SignUp = () => {
 
     } catch (err) {
         console.error("error in signing up: ", err)
+    }
+    finally{
+      setLoading(false);
     }
   }
 
@@ -152,7 +156,8 @@ const SignUp = () => {
               <Button
                 borderRadius={0}
                 type="submit"
-                loadingText="Submitting"
+                loadingText="Signing up..."
+                isLoading={loading}
                 variant="solid"
                 colorScheme="teal"
                 width="full"

@@ -18,16 +18,11 @@ import {
 import { useSetRecoilState } from "recoil";
 import authScreenAtom from "../atoms/auth.atom";
 import userAtom from "../atoms/user.atom";
-// import { FaLock } from "react-icons/fa";
-
-// const CFaUserAlt = chakra(FaUserAlt);
-// const CFaLock = chakra(FaLock);
-
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const setUser = useSetRecoilState(userAtom);
   const handleShowClick = () => setShowPassword(!showPassword);
-
+  const [loading, setLoading] = useState(false);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
   const [input, setInput] = useState({
     username: "",
@@ -35,6 +30,7 @@ const Login = () => {
   });
   const toast = useToast(); 
   const handleLogin = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
         const res = await fetch("/api/users/login", {
@@ -59,6 +55,8 @@ const Login = () => {
         setUser(data);
     } catch (err) {
         console.error("error in logging in: ", err);
+    }finally{
+        setLoading(false);
     }
   };
 
@@ -132,6 +130,7 @@ const Login = () => {
                 width="80%"
                 loadingText="Logging in..."
                 onClick={handleLogin}
+                isLoading={loading}
               >
                 Login
               </Button>

@@ -112,6 +112,7 @@ const CreatePost = () => {
                     boxSize={60}
                   />
                   <CloseButton
+                  color={"#1e1e1e"}
                     bg={"gray.100"}
                     position={"absolute"}
                     top={2}

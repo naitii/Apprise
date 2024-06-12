@@ -2,11 +2,18 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import generateTokensAndSetCookies from "../utils/helpers/generateTokensAndSetCookies.js";
 import {v2 as cloudinary} from "cloudinary";
+import mongoose from "mongoose";
 
 const getUserProfile = async (req, res) => {
-    const {username} = req.params;
+    const {query} = req.params;
     try {
-        const user = await User.findOne({ username}).select("-password");
+        let user;
+        if(mongoose.Types.ObjectId.isValid(query)){
+            user = await User.findById(query).select("-password");
+        }
+        else{
+            user = await User.findOne({ username: query}).select("-password");
+        }
         if(!user){
             return res.status(400).json({ error: "User does not exist" });
         }

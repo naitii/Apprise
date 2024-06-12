@@ -126,7 +126,7 @@ const commentToPost = async (req, res) => {
         post.comments.push(newComment);
 
         await post.save();
-        res.status(200).json({ message: "Comment added successfully", post});
+        res.status(200).json(post);
 
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -146,13 +146,14 @@ const getFeed = async (req, res) => {
 
         const feed = await Post.find({postedBy: {$in: friends}}).sort({createdAt: -1});
 
-        res.status(200).json({message: "Feed fetched successfully", feed});
+        res.status(200).json(feed);
 
     } catch (err) {
         res.status(500).json({ error: err.message });
         console.log("Error in getFeed ", err.message); 
     }
 }
+
 
 const deleteComment = async (req, res) => {
     try {
