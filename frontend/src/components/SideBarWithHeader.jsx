@@ -19,8 +19,6 @@ import {
 
 } from "@chakra-ui/react";
 import {
-  FiStar,
-  FiSettings,
   FiMenu,
   FiBell,
 } from "react-icons/fi";
@@ -107,7 +105,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
           />
         </Flex>
       </Link>
-      <NavItem bg={useColorModeValue("gray.100", "gray.700")}>
+      <NavItem _hover={"none"}>
         <CreatePost />
       </NavItem>
       {LinkItems.map((link) => (

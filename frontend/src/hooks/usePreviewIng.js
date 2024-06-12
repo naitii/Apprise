@@ -25,7 +25,7 @@ const usePreviewImg = () => {
             });
         }
     }
-    return { handleImg, imgUrl };
+    return { handleImg, imgUrl, setImgUrl };
 }
 
 export default usePreviewImg;

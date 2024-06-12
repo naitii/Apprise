@@ -1,11 +1,13 @@
 import User from "../models/user.model.js";
+import {v2 as cloudinary} from "cloudinary";
 import Post from "../models/post.model.js";
 
 const createPost = async (req, res) => {
     try {
-        const {postedBy, caption, img} = req.body;
+        const {postedBy, caption} = req.body;
+        let {img} = req.body;
         if(!postedBy || !caption ){
-            return res.status(400).json({ error: "Please fill all the fields" });
+            return res.status(400).json({ error: "You need to write something" });
         }
 
         const user  = await User.findById(postedBy);
@@ -21,6 +23,11 @@ const createPost = async (req, res) => {
         if(caption.length>maxLength){
             return res.status(400).json({ error: "Caption should be less than 250 characters" });
         }
+        if(img){
+            const uploadResponse = await cloudinary.uploader.upload(img);
+            img = uploadResponse.secure_url;
+        }
+
         let newPost = new Post({
             postedBy,
             caption,
@@ -28,7 +35,7 @@ const createPost = async (req, res) => {
         });
 
         newPost = await newPost.save();
-        res.status(201).json({message: "Post created successfully", newPost});
+        res.status(201).json(newPost);
 
     } catch (err) {
         res.status(500).json({ error: err.message });
