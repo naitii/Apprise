@@ -9,14 +9,14 @@ const Actions = ({ post }) => {
   const user = useRecoilValue(userAtom);
   const showToasts = useShowToast();
   const [post_, setPost] = useState(post);
-  const [liked, setLiked] = useState(post.likes.includes(user._id));
+  const [liked, setLiked] = useState(post?.likes.includes(user._id));
   const [comLoading, setComLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLikeUnlike = async () => {
     if(!user)return showToasts("Error", "You need to be logged in to like a post", "error");
     try {
-      const res = await fetch(`/api/posts/like/${post._id}`, {
+      const res = await fetch(`/api/posts/like/${post?._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,10 +28,11 @@ const Actions = ({ post }) => {
         return;
       }
       if(!liked){
-        setPost({...post, likes: [...post.likes, user._id]});
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        setPost({...post, likes: [...post?.likes, user._id]});
       }
       else{
-        setPost({...post, likes: post.likes.filter((like)=>like !== user._id)});
+        setPost({...post, likes: post?.likes.filter((like)=>like !== user._id)});
       }
       setLiked(!liked);
       
@@ -39,10 +40,11 @@ const Actions = ({ post }) => {
       showToasts("Error", err.message, "error");
     }
   }
-  const handleComment = async () => {
+  const handleComment = async (e) => {
+    e.preventDefault();
     setComLoading(true);
     try {
-      const res = await fetch(`/api/posts/comment/${post._id}`, {
+      const res = await fetch(`/api/posts/comment/${post?._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -148,11 +150,25 @@ const Actions = ({ post }) => {
       </Flex>
       <Flex justifyContent={"space-between"}>
         <Text ml={3} mt={3} fontSize={"sm"}>
-          {post_?.likes.length} likes
+          {post_?.likes.length ||  "0"} likes
         </Text>
         <Text mt={3} ml={5} color={"gray.light"} fontSize={"sm"}>
           {post_?.comments.length} comments
         </Text>
+      </Flex>
+      <Flex  mt={3} gap={0}>
+      <Input
+          value={comment}
+          onClick={(e) => {e.preventDefault()}}
+          onChange={(e) => {
+            setComment(e.target.value);
+          }}
+          ml={3}
+          mr={5}
+          placeholder="Add a comment.."
+          p={2}
+          />
+      <Button onClick={(e)=>{handleComment(e)}}>Comment</Button>
       </Flex>
 
       <>
@@ -173,7 +189,12 @@ const Actions = ({ post }) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleComment} isLoading={comLoading}>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={(e)=>{handleComment(e)}}
+                isLoading={comLoading}
+              >
                 Comment
               </Button>
             </ModalFooter>

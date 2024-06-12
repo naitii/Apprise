@@ -5,12 +5,34 @@ import Actions from "./Actions";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/showToast";
 import moment  from "moment";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/user.atom";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 
 const Post = ({post}) => {
     const {postedBy, img, caption, createdAt} = post;
+    const currentUser = useRecoilValue(userAtom)
     const showToast = useShowToast();
     const [postUser, setPostUser] =useState(null);
+    const handleDeletePost = async (e) => {
+      e.preventDefault();
+        try {
+          if(!window.confirm("Are you sure you want to delete this post?")) return;
+          const res = await fetch(`/api/posts/${post._id}`, {
+            method: "DELETE",
+          })
+          const data = await res.json();
+          if(data.error){
+            showToast("Error", data.error, "error");
+            return;
+          }
+          showToast("Success", data.message, "success");
+
+        } catch (err) {
+            showToast("Error", err.message, "error"); 
+        }
+    }
     useEffect(()=>{
         const getUser = async ()=>{
             try {
@@ -29,52 +51,64 @@ const Post = ({post}) => {
     },[postedBy, showToast])
   return (
     <Link to={`/${postUser?.username}/post/${post._id}`}>
-      <Container mt={3} mb={10} boxShadow={"2px 2px 7px #1e1e1e"} p={4}>
-        <Flex justifyContent={"space-between"}>
-          <Link to={`/profile/${postUser?.username}`}>
-            <Flex alignItems={"center"}>
-              <Avatar
-                name={postUser?.name}
-                src={postUser?.profilePic || "/default-profile-pc.jpg"}
-                size={"md"}
+      <Flex justifyContent={"center"} mt={5}>
+        <Container
+          ml={0}
+          mr={0}
+          mt={3}
+          mb={10}
+          boxShadow={"2px 2px 7px #1e1e1e"}
+          p={4}
+        >
+          <Flex justifyContent={"space-between"}>
+            <Link to={`/profile/${postUser?.username}`}>
+              <Flex alignItems={"center"}>
+                <Avatar
+                  name={postUser?.name}
+                  src={postUser?.profilePic || "/default-profile-pc.jpg"}
+                  size={"md"}
+                />
+                <Box>
+                  <Text ml={3} fontWeight={"bold"}>
+                    {postUser?.username}
+                  </Text>
+                  <Text ml={3} fontSize={"sm"} color={"gray.light"}>
+                    {moment(createdAt).fromNow()}
+                  </Text>
+                </Box>
+              </Flex>
+            </Link>
+            {currentUser?._id === postUser?._id && (
+              <DeleteIcon
+                size={15}
+                cursor={"pointer"}
+                onClick={(e) => {
+                  handleDeletePost(e);
+                }}
               />
-              <Box>
-                <Text ml={3} fontWeight={"bold"}>
-                  {postUser?.username}
-                </Text>
-                <Text ml={3} fontSize={"sm"} color={"gray.light"}>
-                  {moment(createdAt).fromNow()}
-                </Text>
-              </Box>
-            </Flex>
-          </Link>
-          <Ellipsis size={28} cursor={"pointer"} />
-        </Flex>
-        <Flex>
-          <Text mt={3} ml={3} fontSize={"xl"}>
-            {caption}
-          </Text>
-        </Flex>
-        {img && (
-          <Image
-            mt={3}
-            borderRadius={8}
-            src={img}
-            alt="post"
-            width={"100%"}
-            minHeight={"380px"}
-          />
-        )}
-        <Actions post={post} />
-
-        <Input
-          ml={3}
-          mr={5}
-          placeholder="Add a comment.."
-          p={2}
-          onClick={(e) => e.preventDefault()}
-        />
-      </Container>
+            )}
+            {currentUser?._id !== postUser?._id && (
+              <Ellipsis size={28} cursor={"pointer"} />
+            )}
+          </Flex>
+          <Flex>
+            <Text mt={3} ml={3} fontSize={"xl"}>
+              {caption}
+            </Text>
+          </Flex>
+          {img && (
+            <Image
+              mt={3}
+              borderRadius={8}
+              src={img}
+              alt="post"
+              width={"100%"}
+              minHeight={"380px"}
+            />
+          )}
+          <Actions post={post} />
+        </Container>
+      </Flex>
     </Link>
   );
 }

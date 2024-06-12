@@ -1,129 +1,101 @@
-import { Avatar, AvatarGroup, Box, Divider, Flex, Image, Input, Text } from "@chakra-ui/react"
+import { Avatar, Box, Divider, Flex, Image, Text } from "@chakra-ui/react"
 // import UserPost from "../components/UserPost";
-import { Link } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
 import Actions from "../components/Actions";
 import { useEffect, useState } from "react";
 import Comment from "../components/Comment";
 import useShowToast from "../hooks/showToast";
+import moment from "moment";
 
 const PostPage = () => {
   const [post, setPosts] = useState(null);
-  const showToast = useShowToast();
-  let postId=4
-  let postImg="/po-post-3.png"
-  let postTitle="Balancing out my workout with dumpling deliciousness!"
-  let postTime="2 hours ago"
-  let likes=5
-  const [liked, setLiked] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const showToast = useShowToast();
+  const {username} = useParams();
+  const {pid} = useParams();
+  
 
   useEffect(()=>{
-    const getPost=async ()=>{
+    const fetchUser = async () => {
       try {
-        const res = await fetch(`/api/posts/${postId}`);
+        const res = await fetch(`/api/users/profile/${username}`);
+        const data = await res.json();
+        if (data.error) {
+          showToast("Error", data.error, "error");
+          console.log(data.error);
+          return;
+        }
+        setUser(data);
       } catch (err) {
         showToast("Error", err.message, "error");
       } finally {
         setLoading(false);
       }
+    };
+    fetchUser();
+
+    const getPost = async () => {
+      try {
+        const res = await fetch(`/api/posts/${pid}`);
+        const data = await res.json();
+        if (data.error) {
+          showToast("Error", data.error, "error");
+        }
+        setPosts(data);
+      } catch (err) {
+        showToast("Error", err.message, "error");
+      }
     }
+    getPost();
   })
   
   return (
-    <>
-      <Link to={`/pingpo/post/${postId}`}>
-        <Box mt={3} mb={10} p={4} w={"auto"}>
-          <Flex justifyContent={"space-between"}>
-            <Flex alignItems={"center"}>
-              <Avatar
-                name="Ping Xiao Po"
-                src="/po-profile-pic.jpg"
-                size={"md"}
-              />
-              <Box>
-                <Text ml={3} fontWeight={"bold"}>
-                  pingpo
-                </Text>
-                <Text ml={3} fontSize={"sm"} color={"gray.light"}>
-                  {postTime}
-                </Text>
-              </Box>
-            </Flex>
-            <Ellipsis size={28} cursor={"pointer"} />
-          </Flex>
-          <Flex>
-            <Text mt={3} ml={3} fontSize={"xl"}>
-              {postTitle}
-            </Text>
-          </Flex>
-          {postImg && (
-            <Image
-              mt={3}
-              borderRadius={8}
-              src={postImg}
-              alt="post"
-              width={"100%"}
-              minHeight={"380px"}
+    <Flex justifyContent={"center"}>
+      <Box mt={3} mb={10} p={4} w={"80%"}>
+        <Flex justifyContent={"space-between"}>
+          <Flex alignItems={"center"}>
+            <Avatar
+              name="Ping Xiao Po"
+              src={user?.profilePic || "/default-profile-pc.jpg"}
+              size={"md"}
             />
-          )}
-          <Actions liked={liked} setLiked={setLiked} />
-          <Flex>
-            <AvatarGroup
-              size="xs"
-              max={2}
-              ml={3}
-              mt={3}
-              onClick={(e) => e.preventDefault()}
-            >
-              <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
-              <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
-              <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
-              <Avatar
-                name="Prosper Otemuyiwa"
-                src="https://bit.ly/prosper-baba"
-              />
-              <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
-            </AvatarGroup>
-            <Text ml={3} mt={3} fontSize={"sm"}>
-              Liked by{" "}
-              <Text fontWeight={"bold"} display={"inline"}>
-                ryan.florence.83
-              </Text>{" "}
-              and {likes - 1} others
-            </Text>
+            <Box>
+              <Text ml={3} fontWeight={"bold"}>
+                {user?.username}
+              </Text>
+              <Text ml={3} fontSize={"sm"} color={"gray.light"}>
+                {moment(post?.createdAt).fromNow()}
+              </Text>
+            </Box>
           </Flex>
-
-          <Input
-            mt={8}
-            ml={3}
-            mr={5}
-            placeholder="Add a comment.."
-            p={2}
-            onClick={(e) => e.preventDefault()}
+          <Ellipsis size={28} cursor={"pointer"} />
+        </Flex>
+        <Flex>
+          <Text mt={3} ml={3} fontSize={"xl"}>
+            {post?.caption}
+          </Text>
+        </Flex>
+        {post?.img && (
+          <Image
+            mt={3}
+            borderRadius={8}
+            src={post?.img}
+            alt="post"
+            width={"100%"}
+            minHeight={"380px"}
           />
-          <Divider my={5} />
-          <Comment
-            comName={"ryan.florence.83"}
-            comImg="https://bit.ly/ryan-florence"
-            comment="I love dumplings! I'll have to try this out!"
-            likes={2}
-          />
-          <Comment
-            comName={"kent_dodds"}
-            comImg="https://bit.ly/kent-c-doddse"
-            comment="Damn fat panda! You're making me hungry!"
-            likes={2}
-          />
-          <Comment
-            comName={"code_beast"}
-            comImg="https://bit.ly/code-beast"
-            comment="You know why Fat people are so strong? Because they are weightlifting 24/7"
-            likes={20}
-          />
-        </Box>
-      </Link>
-    </>
+        )}
+        <Actions post={post} />
+  
+        <Divider my={5} />
+        {post?.comments.map((comment, index)=>{return (
+            <Comment key={index} comName={comment.username} comImg={comment.userProfilePic} comment={comment.text} likes={comment?.likes?.length}/>
+          )})}
+        
+      </Box>
+    </Flex>
   );
 }
 
