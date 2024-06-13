@@ -1,18 +1,20 @@
-import { Avatar, Box, Container, Flex, Image, Input, Text } from "@chakra-ui/react";
+import { Avatar, Box, Container, Flex, Image, Text } from "@chakra-ui/react";
 import { Ellipsis } from "lucide-react";
 import { Link } from "react-router-dom";
 import Actions from "./Actions";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/showToast";
 import moment  from "moment";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/user.atom";
 import { DeleteIcon } from "@chakra-ui/icons";
+import postsAtom from "../atoms/post.atom";
 
 
 const Post = ({post}) => {
     const {postedBy, img, caption, createdAt} = post;
-    const currentUser = useRecoilValue(userAtom)
+    const currentUser = useRecoilValue(userAtom);
+    const [posts, setPosts] = useRecoilState(postsAtom);
     const showToast = useShowToast();
     const [postUser, setPostUser] =useState(null);
     const handleDeletePost = async (e) => {
@@ -27,7 +29,8 @@ const Post = ({post}) => {
             showToast("Error", data.error, "error");
             return;
           }
-          showToast("Success", data.message, "success");
+          showToast("Success", data.message, "success");  
+          setPosts(posts.filter((p)=>p._id !== post._id));
 
         } catch (err) {
             showToast("Error", err.message, "error"); 
@@ -65,7 +68,7 @@ const Post = ({post}) => {
               <Flex alignItems={"center"}>
                 <Avatar
                   name={postUser?.name}
-                  src={postUser?.profilePic || "/default-profile-pc.jpg"}
+                  src={postUser?.profilePic}
                   size={"md"}
                 />
                 <Box>

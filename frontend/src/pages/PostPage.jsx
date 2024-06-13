@@ -1,6 +1,6 @@
 import { Avatar, Box, Divider, Flex, Image, Text } from "@chakra-ui/react"
 // import UserPost from "../components/UserPost";
-import {  useParams } from "react-router-dom";
+import {  Link, useParams } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
 import Actions from "../components/Actions";
 import { useEffect, useState } from "react";
@@ -8,15 +8,17 @@ import Comment from "../components/Comment";
 import useShowToast from "../hooks/showToast";
 import moment from "moment";
 
+
 const PostPage = () => {
   const [post, setPosts] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  const [sortedComments, setSortedComments] = useState([]);
   const showToast = useShowToast();
   const {username} = useParams();
   const {pid} = useParams();
   
-
+  
   useEffect(()=>{
     const fetchUser = async () => {
       try {
@@ -31,7 +33,7 @@ const PostPage = () => {
       } catch (err) {
         showToast("Error", err.message, "error");
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     fetchUser();
@@ -44,6 +46,8 @@ const PostPage = () => {
           showToast("Error", data.error, "error");
         }
         setPosts(data);
+        
+        setSortedComments(data.comments.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt))));
       } catch (err) {
         showToast("Error", err.message, "error");
       }
@@ -54,24 +58,26 @@ const PostPage = () => {
   return (
     <Flex justifyContent={"center"}>
       <Box mt={3} mb={10} p={4} w={"80%"}>
-        <Flex justifyContent={"space-between"}>
-          <Flex alignItems={"center"}>
-            <Avatar
-              name="Ping Xiao Po"
-              src={user?.profilePic || "/default-profile-pc.jpg"}
-              size={"md"}
-            />
-            <Box>
-              <Text ml={3} fontWeight={"bold"}>
-                {user?.username}
-              </Text>
-              <Text ml={3} fontSize={"sm"} color={"gray.light"}>
-                {moment(post?.createdAt).fromNow()}
-              </Text>
-            </Box>
+        <Link to={`/profile/${user?.username}`}>
+          <Flex justifyContent={"space-between"}>
+            <Flex alignItems={"center"}>
+              <Avatar
+                name="Ping Xiao Po"
+                src={user?.profilePic || "/default-profile-pc.jpg"}
+                size={"md"}
+              />
+              <Box>
+                <Text ml={3} fontWeight={"bold"}>
+                  {user?.username}
+                </Text>
+                <Text ml={3} fontSize={"sm"} color={"gray.light"}>
+                  {moment(post?.createdAt).fromNow()}
+                </Text>
+              </Box>
+            </Flex>
+            <Ellipsis size={28} cursor={"pointer"} />
           </Flex>
-          <Ellipsis size={28} cursor={"pointer"} />
-        </Flex>
+        </Link>
         <Flex>
           <Text mt={3} ml={3} fontSize={"xl"}>
             {post?.caption}
@@ -88,12 +94,24 @@ const PostPage = () => {
           />
         )}
         <Actions post={post} />
-  
+
         <Divider my={5} />
-        {post?.comments.map((comment, index)=>{return (
-            <Comment key={index} comName={comment.username} comImg={comment.userProfilePic} comment={comment.text} likes={comment?.likes?.length}/>
-          )})}
-        
+        {sortedComments?.map((comment, index) => {
+          return (
+            <>
+              <Comment
+                key={index}
+                main={comment}
+                comName={comment.username}
+                comImg={comment.userProfilePic}
+                comment={comment.text}
+                likes={comment?.likes?.length}
+                post={post}
+              />
+            </>
+          );
+        })}
+        <Divider my={5} />
       </Box>
     </Flex>
   );

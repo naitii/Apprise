@@ -34,7 +34,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 
 
 const LinkItems = [
-  { name: "Home", icon: IoHomeOutline },
+  { name: "Home", icon: IoHomeOutline, href: "/"},
   { name: "Chat", icon: IoChatbubbleEllipsesOutline },
   { name: "Notification", icon: IoIosNotificationsOutline },
 ];
@@ -109,9 +109,9 @@ const SidebarContent = ({ onClose, ...rest }) => {
         <CreatePost />
       </NavItem>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
+        <Link to={link.href} key={link.name}>
+          <NavItem as={Link} to={link.href} icon={link.icon}>{link.name}</NavItem>
+        </Link>
       ))}
       <NavItem
         icon={colorMode === "light" ? FaRegMoon : FaRegSun}

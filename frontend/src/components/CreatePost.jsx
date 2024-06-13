@@ -3,9 +3,10 @@ import { AddIcon } from "@chakra-ui/icons";
 import { CiImageOn } from "react-icons/ci";
 import { useRef, useState } from "react";
 import usePreviewImage from "../hooks/usePreviewIng";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import useShowToast from "../hooks/showToast";
 import userAtom from "../atoms/user.atom";
+import postsAtom from "../atoms/post.atom";
 const CreatePost = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [postText, setPostText] = useState("");
@@ -15,6 +16,7 @@ const CreatePost = () => {
   const user = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const { handleImg, imgUrl, setImgUrl } = usePreviewImage();
+  const [post, setPost] = useRecoilState(postsAtom);
   const [loading, setLoading] = useState(false);
   const handleTextChange = (e) => {
     setCharactersCount(250 - e.target.value.length);
@@ -45,6 +47,7 @@ const CreatePost = () => {
       }
       showToast("Success", "Post created", "success");
       onClose();
+      setPost([data, ...post]);
       setPostText("");
       setImgUrl("");
     } catch (err) {

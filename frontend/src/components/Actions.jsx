@@ -150,10 +150,10 @@ const Actions = ({ post }) => {
       </Flex>
       <Flex justifyContent={"space-between"}>
         <Text ml={3} mt={3} fontSize={"sm"}>
-          {post_?.likes.length ||  "0"} likes
+          {post_?.likes.length ||  post?.likes.length} likes
         </Text>
         <Text mt={3} ml={5} color={"gray.light"} fontSize={"sm"}>
-          {post_?.comments.length} comments
+          {post_?.comments.length || post?.comments.length} comments
         </Text>
       </Flex>
       <Flex  mt={3} gap={0}>
