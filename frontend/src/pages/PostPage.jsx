@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, Flex, Image, Text } from "@chakra-ui/react"
+import { Avatar, Box, Divider, Flex, Image, Spinner, Text } from "@chakra-ui/react"
 // import UserPost from "../components/UserPost";
 import {  Link, useParams } from "react-router-dom";
 import { Ellipsis } from "lucide-react";
@@ -12,7 +12,8 @@ import moment from "moment";
 const PostPage = () => {
   const [post, setPosts] = useState(null);
   const [user, setUser] = useState(null);
-  // const [loading, setLoading] = useState(true);
+  const [loading1, setLoading1] = useState(true);
+  const [loading2, setLoading2] = useState(true);
   const [sortedComments, setSortedComments] = useState([]);
   const showToast = useShowToast();
   const {username} = useParams();
@@ -33,7 +34,7 @@ const PostPage = () => {
       } catch (err) {
         showToast("Error", err.message, "error");
       } finally {
-        // setLoading(false);
+        setLoading1(false);
       }
     };
     fetchUser();
@@ -50,10 +51,21 @@ const PostPage = () => {
         setSortedComments(data.comments.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt))));
       } catch (err) {
         showToast("Error", err.message, "error");
+      }finally{
+        setLoading2(false);
+      
       }
     }
     getPost();
   })
+  if(loading1 || loading2){
+    return(
+      <Flex justify="center" align="center" h={"60vh"}>
+        <Spinner size={"xl"}/>
+      </Flex>
+    )
+
+  }
   
   return (
     <Flex justifyContent={"center"}>
@@ -93,7 +105,7 @@ const PostPage = () => {
             minHeight={"380px"}
           />
         )}
-        <Actions post={post} />
+        {post && <Actions post={post} />}
 
         <Divider my={5} />
         {sortedComments?.map((comment, index) => {
