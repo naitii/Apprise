@@ -66,10 +66,9 @@ const getAllMessages = async (req, res) => {
 
 const getConverastion = async (req, res) => {
     try {
-        const {otherOne} = req.params;
         const userId = req.user._id;
 
-        const convos = await Conversation.find({members: userId}).populate("members", "username profilePic");     
+        const convos = await Conversation.find({members: userId});     
         res.status(200).json(convos);
 
     } catch (err) {

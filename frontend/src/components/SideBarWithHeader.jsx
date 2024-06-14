@@ -101,7 +101,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
           />
           <CloseButton
             display={{ base: "flex", md: "none" }}
-            onClick={onClose}
+            onClick={(e)=>{e.preventDefault(); onClose()}}
           />
         </Flex>
       </Link>
@@ -129,7 +129,6 @@ const SidebarContent = ({ onClose, ...rest }) => {
 const NavItem = ({ icon, children, ...rest }) => {
   return (
     <Link
-      to="#"
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
