@@ -11,6 +11,7 @@ import { useRecoilState } from "recoil";
 import userAtom from "./atoms/user.atom";
 import UpdateProfile from "./pages/UpdateProfile";
 import SidebarWithHeader from "./components/SideBarWithHeader";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
 
@@ -45,7 +46,7 @@ function App() {
             !user[0] ? (
               <>
                 <Header />
-                 <AuthPage />
+                <AuthPage />
               </>
             ) : (
               <Navigate to="/" />
@@ -59,7 +60,9 @@ function App() {
             user[0] ? (
               <SidebarWithHeader children={<UserPage />} />
             ) : (
-              <Navigate to="/auth" />)}
+              <Navigate to="/auth" />
+            )
+          }
         ></Route>
         <Route
           path="/:username/post/:pid"
@@ -67,7 +70,19 @@ function App() {
             user[0] ? (
               <SidebarWithHeader children={<PostPage />} />
             ) : (
-              <Navigate to="/auth" />)}
+              <Navigate to="/auth" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/chat"
+          element={
+            user[0] ? (
+              <SidebarWithHeader children={<ChatPage />} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
         ></Route>
       </Routes>
       {/* </Container> */}

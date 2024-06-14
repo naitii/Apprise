@@ -1,5 +1,5 @@
 import { Button, Flex, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useColorModeValue, useDisclosure } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/user.atom";
 import useShowToast from "../hooks/showToast";
@@ -12,7 +12,32 @@ const Actions = ({ post }) => {
   const [liked, setLiked] = useState(post?.likes.includes(user._id));
   const [comLoading, setComLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [postedBy, setPostedBy] = useState(null);
 
+  useEffect(() => {
+
+    const getPoster = async () => {
+      try {
+        const res = await fetch(`/api/users/profile/${post.postedBy}`);
+      const data = await res.json();
+          if (data.error) {
+            showToasts("Error", data.error, "error");
+          return;
+          }
+    setPostedBy(data);
+    } catch (err) {
+      showToasts("Error", err.message, "error");
+    }
+    }
+  getPoster();
+}, [post, user, showToasts]);
+
+  const copyurl = async () => {
+    const url = `${window.location.origin}/${postedBy?.username}/post/${post?._id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showToasts("Link Copied", "Post link copied to clipboard", "success");
+    });
+  };
   const handleLikeUnlike = async () => {
     if(!user)return showToasts("Error", "You need to be logged in to like a post", "error");
     try {
@@ -120,6 +145,7 @@ const Actions = ({ post }) => {
 
         {/* share */}
         <svg
+        onClick={copyurl}
           aria-label="Share"
           color=""
           fill="rgb(243, 245, 247)"

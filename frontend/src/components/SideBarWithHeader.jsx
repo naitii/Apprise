@@ -35,7 +35,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 
 const LinkItems = [
   { name: "Home", icon: IoHomeOutline, href: "/"},
-  { name: "Chat", icon: IoChatbubbleEllipsesOutline },
+  { name: "Chat", icon: IoChatbubbleEllipsesOutline, href: "/chat" },
   { name: "Notification", icon: IoIosNotificationsOutline },
 ];
 

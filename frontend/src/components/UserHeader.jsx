@@ -87,7 +87,6 @@ const UserHeader = ({ user, postCount }) => {
         </Box>
       </Flex>
       <Text fontSize={["md", "xl"]} textAlign={"center"}>
-        {/* 🌟 Dragon Warrior | Kung Fu Master | Noodle Enthusiast 🍜 */}
         {user.bio}
       </Text>
 
