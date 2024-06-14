@@ -83,7 +83,8 @@ const Post = ({post}) => {
             </Link>
             {currentUser?._id === postUser?._id && (
               <DeleteIcon
-                size={15}
+                size={16}
+                m={4}
                 cursor={"pointer"}
                 onClick={(e) => {
                   handleDeletePost(e);
