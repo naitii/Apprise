@@ -12,6 +12,7 @@ import userAtom from "./atoms/user.atom";
 import UpdateProfile from "./pages/UpdateProfile";
 import SidebarWithHeader from "./components/SideBarWithHeader";
 import ChatPage from "./pages/ChatPage";
+import Chats from "./components/Chats";
 
 function App() {
 
@@ -79,6 +80,16 @@ function App() {
           element={
             user[0] ? (
               <SidebarWithHeader children={<ChatPage />} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/chat/mob"
+          element={
+            user[0] ? (
+              <SidebarWithHeader children={<Chats />} />
             ) : (
               <Navigate to="/auth" />
             )

@@ -68,7 +68,7 @@ const getConverastion = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        const convos = await Conversation.find({members: userId});     
+        const convos = await Conversation.find({members: userId}).sort({updatedAt: -1});     
         res.status(200).json(convos);
 
     } catch (err) {

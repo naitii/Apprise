@@ -7,14 +7,21 @@ import useShowToast from "../hooks/showToast";
 import userAtom from "../atoms/user.atom";
 import { CiImageOn } from "react-icons/ci";
 import { BsSend } from "react-icons/bs";
-
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 const Chats = () => {
-  const [selectedChat] = useRecoilState(selectedChatAtom);
+  const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
   const user = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const [allChat, setAllChat] = useState([]);
   const [message, setMessage] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+    }},[]);
 
    useEffect(() => {
        const element = document.getElementById("messageContainer");
@@ -67,7 +74,7 @@ const Chats = () => {
 
   if (selectedChat._id === "") {
     return (
-      <Flex alignItems={"center"} h={"70vh"}>
+      <Flex alignItems={"center"} h={"70vh"} justifyContent={"center"}>
         <Text fontSize={20}>Select a chat to start messaging</Text>
       </Flex>
     );
@@ -87,6 +94,11 @@ const Chats = () => {
         p={3}
         pl={6}
       >
+        {isMobile && (
+         <Box as={IoIosArrowRoundBack} w={9} h={9} color={"blue.500"} onClick={(e)=>{e.preventDefault;history.back();
+            setSelectedChat({ _id: "", userId: "", name: "", username: "", userProfilePic: "" });
+          }} />
+        )}
         <Avatar src={selectedChat.userProfilePic} />
         <Box>
           <Text ml={3} fontSize={20} fontWeight={"bold"}>
@@ -110,6 +122,10 @@ const Chats = () => {
           </Text>
         </Flex>
         {allChat.map((chat) => (
+          <>
+          {/* {date !== formatDate(chat.createdAt) && (
+            <Flex justifyContent={"center"} mt={2}> {formatDate(chat.createdAt)} </Flex>
+          )} */}
           <Flex
             key={chat._id}
             justifyContent={
@@ -135,8 +151,10 @@ const Chats = () => {
               <Avatar w={10} h={10} src={user.profilePic} />
             )}
           </Flex>
+        </>
         ))}
       </Box>
+
 
       <Flex alignItems={"center"}>
         <Box as={CiImageOn} w={9} h={9} color={"blue.500"} m={2} />

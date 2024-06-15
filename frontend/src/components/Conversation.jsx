@@ -27,7 +27,12 @@ const Conversation = ({ user }) => {
   const [otherOne, setOtherOne] = useState([]);
   const showToast = useShowToast();
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
+  const [isMobile, setIsMobile] = useState(false);
+  
   useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+    }
     const fetchConversations = async () => {
       try {
         const res = await fetch("/api/chat/conversations");
@@ -49,11 +54,11 @@ const Conversation = ({ user }) => {
             return {
               user: data2,
               lastMessage: item.lastMessage,
+              updatedAt: item.updatedAt,
               sender: senderOfLastMessage,
             };
           })
         );
-
         setOtherOne(otherUsers);
       } catch (err) {
         showToast("error", "Error in fetching conversations", err.message);
@@ -78,10 +83,12 @@ const Conversation = ({ user }) => {
           <Flex w="100%" alignItems={"center"} gap={4}>
             <Avatar size="lg" name={user.username} src={user.profilePic} />
             <Box>
-            <Text fontSize="xl" fontWeight="bold">
-              {user.name}
-            </Text>
-            <Text fontSize="md" color="gray">@{user.username}</Text>
+              <Text fontSize="xl" fontWeight="bold">
+                {user.name}
+              </Text>
+              <Text fontSize="md" color="gray">
+                @{user.username}
+              </Text>
             </Box>
           </Flex>
         </Link>
@@ -106,8 +113,8 @@ const Conversation = ({ user }) => {
           as={IoIosSearch}
           pl={2}
           mt={2}
-          w={"15%"}
-          h={"100%"}
+          w={["15%"]}
+          h={["100%"]}
           justifySelf={"center"}
           bg={useColorModeValue("gray.300", "#1e1e1e")}
         />
@@ -139,6 +146,8 @@ const Conversation = ({ user }) => {
         otherOne.length &&
         otherOne.map((thatOne, index) => (
           <Box
+            as={Link}
+            to={isMobile ? `/chat/mob` : "#"}
             key={index}
             w={"100%"}
             h={20}
@@ -171,13 +180,16 @@ const Conversation = ({ user }) => {
                 <Text h={4} w={"60%"} fontWeight={"bold"}>
                   {thatOne?.user.username}
                 </Text>
-                <Text h={3} w={"100%"} color={"gray"}>
+                <Text h={3} w={"100%"} minH={"fit-content"} color={"gray"}>
                   {thatOne?.sender}:{" "}
                   {thatOne?.lastMessage?.text.length > 15
                     ? thatOne?.lastMessage?.text.substring(0, 15) + "...."
                     : thatOne?.lastMessage?.text}
                 </Text>
               </Flex>
+              <Box>
+                {/* <Text fontSize={"xs"} color={"gray"} >{moment(thatOne.updatedAt).fromNow()}</Text> */}
+              </Box>
             </Flex>
             {/* <Divider my={3} /> */}
           </Box>
