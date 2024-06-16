@@ -16,6 +16,8 @@ import {
   MenuButton,
   Image,
   useColorMode,
+  Input,
+  Spinner,
 
 } from "@chakra-ui/react";
 import {
@@ -31,6 +33,8 @@ import { Link } from "react-router-dom";
 import CreatePost from "./CreatePost";
 import LogoutBtn from "./LogoutBtn";
 import { IoIosNotificationsOutline } from "react-icons/io";
+import { useState } from "react";
+import useShowToast from "../hooks/showToast";
 
 
 const LinkItems = [
@@ -165,7 +169,40 @@ const NavItem = ({ icon, children, ...rest }) => {
 const MobileNav = ({ onOpen, ...rest }) => {
     const currentUser = useRecoilValue(userAtom);
     const { colorMode } = useColorMode();
+    const [searchedUser, setSearchedUser] = useState("");
+    const [users, setUsers] = useState([]);
+    const showToast = useShowToast();
+    const [loading, setLoading] = useState(false);
 
+    const handleChange = async (e) => {
+      setLoading(true);
+      setSearchedUser(e.target.value);
+      if(e.target.value === "") {
+        setUsers([]);
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/users/suggestedUsers/${e.target.value}`)
+        const data = await res.json();
+        if (data.error) {
+          showToast("error", "Error in searching user", data.error);
+          return;
+        }
+        if(data.length >=5) {
+          const data2  = data.slice(0,5);
+          setUsers(data2);
+          setLoading(false);
+          return
+        }
+        setUsers(data);        
+      } catch (err) {
+        showToast("error", "Error in searching user", err.message);
+      }finally{
+        setLoading(false);
+      }
+
+    }
 
   return (
     <Flex
@@ -202,7 +239,39 @@ const MobileNav = ({ onOpen, ...rest }) => {
           }
         />
       </Link>
-
+      <HStack w={"75%"} position={"relative"}>
+        <Input
+          placeholder="Search username"
+          display={{ base: "none", md: "flex" }}
+          bg={useColorModeValue("gray.200", "#1e1e1e")}
+          rounded={20}
+          w={"75%"}
+          onChange={handleChange}
+          value={searchedUser}
+        />
+        {loading && <VStack position={"absolute"} zIndex={10} top={10} bg={useColorModeValue("white","#1e1e1e")} rounded={15} alignItems={"center"} w={"75%"}><Spinner size={4}/></VStack>}
+        <VStack position={"absolute"} zIndex={10} top={10} bg={useColorModeValue("white","#1e1e1e")} rounded={15} alignItems={"flex-start"} w={"75%"}>
+          {users.map((user) => {
+            return (
+              <Link to={`/profile/${user.username}`} key={user._id} style={{width: "100%"}}>
+                <Flex
+                  onClick={()=>{setUsers([])}}
+                  p={2}
+                  w={"100%"}
+                  rounded={5}
+                  alignItems={"center"}
+                >
+                  <Avatar size={"lg"} src={user.profilePic} ml={4} mt={2}/>
+                  <Box>
+                  <Text ml={2}>{user.name}</Text>
+                  <Text ml={2} color="gray.600">@{user.username}</Text>
+                  </Box>
+                </Flex>
+              </Link>
+            );
+          })}
+        </VStack>
+      </HStack>
       <HStack spacing={{ base: "0", md: "6" }}>
         <IconButton
           size="lg"

@@ -1,5 +1,6 @@
 import Chat from "../models/chat.model.js";
 import Conversation from "../models/conversation.model.js";
+import { getReceiverSocket, io } from "../socket/socket.js";
 
 const sendMessage = async (req, res) => {
     try {
@@ -29,13 +30,20 @@ const sendMessage = async (req, res) => {
                 sender: senderId,
                 text: message,
             });
-            await newChat.save();
+            const chat = await newChat.save();
+            const receiverSocketId = getReceiverSocket(receiverId);
+            if (io.sockets.sockets.has(receiverSocketId)) {
+                io.to(receiverSocketId).emit("newChat", chat);
+            }
+            
             await Conversation.findByIdAndUpdate(convo._id, {
                 lastMessage: {
                     text: message,
                     sender: senderId,
                 },
             });
+
+        
         res.status(200).json(newChat);
     } catch (err) {
         res.status(500).json({ error: err.message });

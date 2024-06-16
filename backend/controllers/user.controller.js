@@ -218,6 +218,33 @@ const updateProfile = async (req, res) => {
         console.log("Error in update profile ", err.message);
     }
 }
+const getSuggestedUsers = async (req, res) => {
+    const {value} = await req.params;
+    if(value.length==0){
+        return res.status(200).json([]);
+    }
+    try {
+         const users = await User.find({
+           $or: [
+             { username: { $regex: value, $options: "i" } },
+             { name: { $regex: value, $options: "i" } },
+           ],
+         }).select("-password")
+         users.sort((a,b)=>(a.friends.length>b.friends.length)?-1:1);
+        res.status(200).json(users);       
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log("Error in get suggested users ", err.message);
+    }
+}
 
 
-export { signupUser, loginUser, logoutUser, addRemoveFriend, updateProfile, getUserProfile };
+export {
+  getSuggestedUsers,
+  signupUser,
+  loginUser,
+  logoutUser,
+  addRemoveFriend,
+  updateProfile,
+  getUserProfile,
+};

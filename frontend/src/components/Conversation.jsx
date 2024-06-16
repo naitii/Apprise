@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Button,
   Divider,
   Flex,
   Input,
@@ -28,7 +29,9 @@ const Conversation = ({ user }) => {
   const showToast = useShowToast();
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
   const [isMobile, setIsMobile] = useState(false);
-  
+  const [searchedUser, setSearchedUser] = useState("");
+  const [searching, setSearching] = useState(false);
+
   useEffect(() => {
     if (window.innerWidth < 768) {
       setIsMobile(true);
@@ -70,6 +73,60 @@ const Conversation = ({ user }) => {
     fetchConversations();
   }, [user._id, showToast]);
 
+  const handleSearch = async () => {
+    setSearching(true);
+    try {
+      const res = await fetch(`/api/users/profile/${searchedUser}`);
+      const data = await res.json();
+      console.log(data);
+      if(data.error){
+        showToast("Error", data.error, "error");
+        setSearching(false);
+        return;
+      }
+      if(searchedUser === user.username){
+        showToast("Error", "You are searching for yourself 😭", "error");
+        setSearching(false);
+        return;
+      }
+      
+      if(conversations.find((item)=>item.members.includes(data?._id))){
+        setSelectedChat({
+          _id: conversations.find((item)=>item.members.includes(data._id))?._id,
+          userId: data?._id,
+          name: data?.name,
+          username: data?.username,
+          userProfilePic: data?.profilePic,
+        })
+        setSearching(false);
+        return;
+      }
+      const mockConvo = {
+        mock: true,
+        user: data,
+        lastMessage: {
+          text: "Say Hi to start a conversation",
+          sender: "",
+        },
+        updatedAt: "",
+        sender: "",
+      };
+      setOtherOne((prev) => [ mockConvo, ...prev]);
+      setSelectedChat({
+        _id: Date.now(),
+        userId: data._id,
+        name: data.name,
+        username: data.username,
+        userProfilePic: data.profilePic,
+        mock: true,
+      });
+
+
+    } catch (error) {
+      showToast("Error", "Error in searching user", "error");
+    }
+  }
+
   return (
     <VStack
       bg={useColorModeValue("gray.300", "#1e1e1e")}
@@ -103,18 +160,21 @@ const Conversation = ({ user }) => {
         <Input
           mt={4}
           placeholder="Search"
+          value={searchedUser}
+          onChange={(e) => setSearchedUser(e.target.value)}
           w={"100%"}
           bg={useColorModeValue("white", "gray.700")}
           border="none"
           p={2}
           rounded={5}
         />
-        <Box
+        <Button
           as={IoIosSearch}
-          pl={2}
+          onClick={handleSearch}
+          isLoading={searching}
           mt={2}
-          w={["15%"]}
-          h={["100%"]}
+          w={["25%"]}
+          h={["90%"]}
           justifySelf={"center"}
           bg={useColorModeValue("gray.300", "#1e1e1e")}
         />
@@ -147,12 +207,24 @@ const Conversation = ({ user }) => {
         otherOne.map((thatOne, index) => (
           <Box
             as={Link}
-            to={isMobile ? `/chat/mob` : "#"}
+            to={isMobile ? `/chat/mob` : ""}
             key={index}
             w={"100%"}
             h={20}
             onClick={() => {
+              if(thatOne.mock){
+                setSelectedChat({
+                  mock: thatOne.mock,
+                  _id: thatOne._id,
+                  userId: thatOne.user._id,
+                  name: thatOne.user.name,
+                  username: thatOne.user.username,
+                  userProfilePic: thatOne.user.profilePic,
+                });
+                return;
+              }
               setSelectedChat({
+                mock: thatOne.mock,
                 _id: conversations[index]._id,
                 userId: thatOne.user._id,
                 name: thatOne.user.name,
@@ -163,7 +235,7 @@ const Conversation = ({ user }) => {
             p={2}
             cursor={"pointer"}
             bg={
-              selectedChat._id === conversations[index]._id
+              selectedChat._id === conversations[index]?._id
                 ? colorMode === "light"
                   ? "gray.100"
                   : "gray.700"
@@ -177,15 +249,24 @@ const Conversation = ({ user }) => {
                 flexDirection={"column"}
                 justifyContent={"space-between"}
               >
-                <Text h={4} w={"60%"} fontWeight={"bold"}>
+                <Text h={4} w={"60%"} fontWeight={"bold"}> 
                   {thatOne?.user.username}
                 </Text>
-                <Text h={3} w={"100%"} minH={"fit-content"} color={"gray"}>
+                {thatOne?.mock && (
+                  <Text h={3} w={"100%"} minH={"fit-content"} color={"gray"}>
+                    {thatOne?.lastMessage?.text}
+                  </Text>
+                
+                )}
+                {!thatOne?.mock && (
+
+                  <Text h={3} w={"100%"} minH={"fit-content"} color={"gray"}>
                   {thatOne?.sender}:{" "}
                   {thatOne?.lastMessage?.text.length > 15
                     ? thatOne?.lastMessage?.text.substring(0, 15) + "...."
                     : thatOne?.lastMessage?.text}
                 </Text>
+                )}
               </Flex>
               <Box>
                 {/* <Text fontSize={"xs"} color={"gray"} >{moment(thatOne.updatedAt).fromNow()}</Text> */}
