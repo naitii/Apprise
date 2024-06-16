@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Avatar, Box, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
 import { useRecoilState, useRecoilValue } from "recoil";
