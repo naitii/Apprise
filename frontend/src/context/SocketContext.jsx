@@ -21,12 +21,10 @@ export const SocketContextProvider = ({ children }) => {
           userId: user._id,
         },
       });
-      console.log("Socket connected", socketInstance);
       setSocket(socketInstance);
 
       return () => {
         socketInstance.disconnect();
-        console.log("Socket disconnected");
       };
     }
   }, [user?._id]);

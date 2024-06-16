@@ -33,7 +33,7 @@ import { Link } from "react-router-dom";
 import CreatePost from "./CreatePost";
 import LogoutBtn from "./LogoutBtn";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useShowToast from "../hooks/showToast";
 
 
@@ -173,7 +173,13 @@ const MobileNav = ({ onOpen, ...rest }) => {
     const [users, setUsers] = useState([]);
     const showToast = useShowToast();
     const [loading, setLoading] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
+    useEffect(() => {
+      if(window.innerWidth<800){
+        setIsMobile(true);
+      }
+    },[])
     const handleChange = async (e) => {
       setLoading(true);
       setSearchedUser(e.target.value);
@@ -208,7 +214,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
     <Flex
       ml={{ base: 0, md: 60 }}
       px={{ base: 4, md: 4 }}
-      height="20"
+      height="120px"
       alignItems="center"
       bg={useColorModeValue("white", "#1e1e1e")}
       // borderBottomWidth="1px"
@@ -223,55 +229,174 @@ const MobileNav = ({ onOpen, ...rest }) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
+      {isMobile && (
+        <Flex
+          alignItems="center"
+          width={"100%"}
+          flexDirection={"column"}
+          gap={5}
+        >
+          <Link to="/">
+            <Image
+              display={{ base: "flex", md: "none" }}
+              placeSelf={"flex-start"}
+              width={"150px"}
+              alt="logo"
+              cursor={"pointer"}
+              mt={5}
+              src={
+                colorMode === "light"
+                  ? "/LightLogo/logo-no-background.svg"
+                  : "/DarkLogo/logo-no-background.svg"
+              }
+            />
+          </Link>
+          <HStack w={"75%"} position={"relative"} h={"100%"}>
+            <Input
+              placeholder="Search Friends"
+              display={"flex"}
+              bg={useColorModeValue("gray.200", "#1e1e1e")}
+              rounded={20}
+              h={"100%"}
+              w={["100%", "75%"]}
+              onChange={handleChange}
+              value={searchedUser}
+            />
+            {loading && (
+              <VStack
+                position={"absolute"}
+                zIndex={10}
+                top={10}
+                bg={useColorModeValue("white", "#1e1e1e")}
+                rounded={15}
+                alignItems={"center"}
+                w={["100%", "75%"]}
+              >
+                <Spinner height={10}  width={10}/>
+              </VStack>
+            )}
+            <VStack
+              position={"absolute"}
+              zIndex={10}
+              top={7}
+              bg={useColorModeValue("white", "#1e1e1e")}
+              rounded={15}
+              alignItems={"flex-start"}
+              w={["100%", "75%"]}
+            >
+              {users.map((user) => {
+                return (
+                  <Link
+                    to={`/profile/${user.username}`}
+                    key={user._id}
+                    style={{ width: "100%" }}
+                  >
+                    <Flex
+                      onClick={() => {
+                        setUsers([]);
+                      }}
+                      p={2}
+                      w={"100%"}
+                      rounded={5}
+                      alignItems={"center"}
+                    >
+                      <Avatar size={"lg"} src={user.profilePic} ml={2} mt={2} />
+                      <Box>
+                        <Text ml={2}>{user.name}</Text>
+                        <Text ml={2} color="gray.600">
+                          @{user.username}
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Link>
+                );
+              })}
+            </VStack>
+          </HStack>
+        </Flex>
+      )}
+      {!isMobile && (
+        <>
+          <Link to="/">
+            <Image
+              display={{ base: "flex", md: "none" }}
+              placeSelf={"flex-start"}
+              width={"150px"}
+              alt="logo"
+              cursor={"pointer"}
+              mt={5}
+              src={
+                colorMode === "light"
+                  ? "/LightLogo/logo-no-background.svg"
+                  : "/DarkLogo/logo-no-background.svg"
+              }
+            />
+          </Link>
+          <HStack w={"75%"} position={"relative"} h={"100%"}>
+            <Input
+              placeholder="Search Friends"
+              display={"flex"}
+              bg={useColorModeValue("gray.200", "#1e1e1e")}
+              rounded={20}
+              h={["100%", "35%"]}
+              w={["100%", "75%"]}
+              onChange={handleChange}
+              value={searchedUser}
+            />
+            {loading && (
+              <VStack
+                position={"absolute"}
+                zIndex={10}
+                top={10}
+                bg={useColorModeValue("white", "#1e1e1e")}
+                rounded={15}
+                alignItems={"center"}
+                w={["100%", "75%"]}
+              >
+                <Spinner size={4} />
+              </VStack>
+            )}
+            <VStack
+              position={"absolute"}
+              zIndex={10}
+              top={10}
+              bg={useColorModeValue("white", "#1e1e1e")}
+              rounded={15}
+              alignItems={"flex-start"}
+              w={["100%", "75%"]}
+            >
+              {users.map((user) => {
+                return (
+                  <Link
+                    to={`/profile/${user.username}`}
+                    key={user._id}
+                    style={{ width: "100%" }}
+                  >
+                    <Flex
+                      onClick={() => {
+                        setUsers([]);
+                      }}
+                      p={2}
+                      w={"100%"}
+                      rounded={5}
+                      alignItems={"center"}
+                    >
+                      <Avatar size={"lg"} src={user.profilePic} ml={2} mt={2} />
+                      <Box>
+                        <Text ml={2}>{user.name}</Text>
+                        <Text ml={2} color="gray.600">
+                          @{user.username}
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Link>
+                );
+              })}
+            </VStack>
+          </HStack>
+        </>
+      )}
 
-      <Link to="/">
-        <Image
-          display={{ base: "flex", md: "none" }}
-          placeSelf={"flex-start"}
-          width={"150px"}
-          alt="logo"
-          cursor={"pointer"}
-          mt={5}
-          src={
-            colorMode === "light"
-              ? "/LightLogo/logo-no-background.svg"
-              : "/DarkLogo/logo-no-background.svg"
-          }
-        />
-      </Link>
-      <HStack w={"75%"} position={"relative"}>
-        <Input
-          placeholder="Search username"
-          display={{ base: "none", md: "flex" }}
-          bg={useColorModeValue("gray.200", "#1e1e1e")}
-          rounded={20}
-          w={"75%"}
-          onChange={handleChange}
-          value={searchedUser}
-        />
-        {loading && <VStack position={"absolute"} zIndex={10} top={10} bg={useColorModeValue("white","#1e1e1e")} rounded={15} alignItems={"center"} w={"75%"}><Spinner size={4}/></VStack>}
-        <VStack position={"absolute"} zIndex={10} top={10} bg={useColorModeValue("white","#1e1e1e")} rounded={15} alignItems={"flex-start"} w={"75%"}>
-          {users.map((user) => {
-            return (
-              <Link to={`/profile/${user.username}`} key={user._id} style={{width: "100%"}}>
-                <Flex
-                  onClick={()=>{setUsers([])}}
-                  p={2}
-                  w={"100%"}
-                  rounded={5}
-                  alignItems={"center"}
-                >
-                  <Avatar size={"lg"} src={user.profilePic} ml={4} mt={2}/>
-                  <Box>
-                  <Text ml={2}>{user.name}</Text>
-                  <Text ml={2} color="gray.600">@{user.username}</Text>
-                  </Box>
-                </Flex>
-              </Link>
-            );
-          })}
-        </VStack>
-      </HStack>
       <HStack spacing={{ base: "0", md: "6" }}>
         <IconButton
           size="lg"

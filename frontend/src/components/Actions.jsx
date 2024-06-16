@@ -21,12 +21,12 @@ const Actions = ({ post }) => {
         const res = await fetch(`/api/users/profile/${post.postedBy}`);
       const data = await res.json();
           if (data.error) {
-            showToasts("Error", data.error, "error");
+            showToasts("Error 5", data.error, "error");
           return;
           }
     setPostedBy(data);
     } catch (err) {
-      showToasts("Error", err.message, "error");
+      showToasts("Error 6", err.message, "error");
     }
     }
   getPoster();

@@ -26,14 +26,14 @@ const Post = ({post}) => {
           })
           const data = await res.json();
           if(data.error){
-            showToast("Error", data.error, "error");
+            showToast("Error1", data.error, "error");
             return;
           }
           showToast("Success", data.message, "success");  
           setPosts(posts.filter((p)=>p._id !== post._id));
 
         } catch (err) {
-            showToast("Error", err.message, "error"); 
+            showToast("Error 2", err.message, "error"); 
         }
     }
     useEffect(()=>{
@@ -42,12 +42,12 @@ const Post = ({post}) => {
                 const res = await fetch("/api/users/profile/"+postedBy);
                 const data = await res.json();
                 if(data.error){
-                    showToast("Error", data.error, "error");
+                    showToast("Error 3", data.error, "error");
                     return;
                 }
                 setPostUser(data);
             } catch (err) {
-                showToast("Error", err.message, "error");
+                showToast("Error 4", err.message, "error");
             }
         }
         getUser();
