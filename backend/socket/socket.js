@@ -11,7 +11,6 @@ const io = new Server(server, {
     }
 })
 export const getReceiverSocket = (receiverId) => {
-    console.log("receiver id ", receiverId)
     return userSocketMap[receiverId];
 }
 const userSocketMap = {};
@@ -19,7 +18,6 @@ io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId;
     if(userId!=="undefined"){
         userSocketMap[userId] = socket.id;
-        // console.log("user map ", userSocketMap)
     }
 
     io.on('disconnect', () => {

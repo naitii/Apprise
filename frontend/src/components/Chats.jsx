@@ -52,7 +52,6 @@ const Chats = () => {
         return;
       }
       setAllChat([...allChat, data]);
-      console.log(data)
       setMessage("");
     } catch (err) {
       showToast("error", "Error in sending message", err.message);
@@ -61,11 +60,13 @@ const Chats = () => {
   useEffect(() => {
     // if(socket){
     socket?.on("newChat", (data) => {
-      console.log("new chat data: ", allChat[0], data);
-      setAllChat((prevChat) => [...prevChat, data]);
+      console.log("new chat data: ",selectedChat._id, data?.convoId);
+      if(selectedChat._id.toString() === data?.convoId.toString()){
+        setAllChat((prevChat) => [...prevChat, data]);
+        const element = document.getElementById("messageContainer");
+        if (element) element.scrollTop = element.scrollHeight;
+      }
     });
-    const element = document.getElementById("messageContainer");
-    if (element) element.scrollTop = element.scrollHeight;
 
     return () => {
       socket?.off("newChat");
