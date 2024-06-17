@@ -34,7 +34,10 @@ app.use("/api/posts", postRoutes);
 app.use("/api/chat", messageRoutes);
 app.use("/api/notification", notificationRoutes);
 
-if(process.env.NODE_ENV.trim("") === "production"){
+const production = true;
+// process.env.NODE_ENV.trim("") === "production"
+
+if(production){
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 }
 
