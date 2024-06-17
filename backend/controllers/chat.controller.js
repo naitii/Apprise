@@ -1,17 +1,26 @@
 import Chat from "../models/chat.model.js";
 import Conversation from "../models/conversation.model.js";
+import {v2 as cloudinary} from "cloudinary";
 import { getReceiverSocket, io } from "../socket/socket.js";
 
 const sendMessage = async (req, res) => {
     try {
         const {receiverId, message} = req.body;
+        let {img} = req.body;
         const senderId = req.user._id;  
-        if(!receiverId || !message) {
+        if(!receiverId){
+            return res.status(400).json({ error: "Reciever not found" });
+        }
+        if(!img && !message) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
         if(senderId === receiverId) {
             return res.status(400).json({ error: "You cannot send message to yourself" });
         }
+
+        
+
+
         let convo = await Conversation.findOne({
             members: { $all: [senderId, receiverId] },
         });
@@ -25,9 +34,16 @@ const sendMessage = async (req, res) => {
             });
             await convo.save();
         }
+
+        if (img) {
+          const res = await cloudinary.uploader.upload(img);
+          img = res.secure_url;
+        }
+
             const newChat = new Chat({
                 convoId: convo._id,
                 sender: senderId,
+                img: img || "",
                 text: message,
             });
             const chat = await newChat.save();

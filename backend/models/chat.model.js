@@ -13,8 +13,12 @@ const chatSchema = mongoose.Schema({
     },
     text: {
         type: String,
-        required: true,
+        default: "",
     },
+    img: {
+        type: String,
+        default: "",
+    }
 }, { timestamps: true });
 
 

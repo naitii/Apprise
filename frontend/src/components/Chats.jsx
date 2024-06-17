@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Avatar, Box, Flex, Input, Text, useColorModeValue } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Text, useColorModeValue, useDisclosure } from "@chakra-ui/react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { selectedChatAtom } from "../atoms/chat.atom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useShowToast from "../hooks/showToast";
 import userAtom from "../atoms/user.atom";
 import { CiImageOn } from "react-icons/ci";
@@ -11,6 +11,7 @@ import { BsSend } from "react-icons/bs";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { useSocket } from "../context/SocketContext";
+import usePreviewImg from "../hooks/usePreviewIng"; 
 
 
 const Chats = () => {
@@ -21,6 +22,11 @@ const Chats = () => {
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const socket = useSocket();
+  const imgRef = useRef(null);
+  const { onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
+  const { handleImg, imgUrl, setImgUrl } = usePreviewImg();
+
 
   useEffect(() => {
     if (window.innerWidth < 768) {
@@ -34,27 +40,57 @@ const Chats = () => {
    });
 
   const sendMessage = async () => {
-    if(message.trim() === "") return;
+    if(message.trim() === "" && !imgUrl) return;
+    if(loading) return;
+    setLoading(true);
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          receiverId: selectedChat.userId,
-          message,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        showToast("error", "Error in sending message", data.error);
-        return;
+      if(imgUrl){
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            receiverId: selectedChat.userId,
+            message: "",
+            img: imgUrl,
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          showToast("error", "Error in sending message", data.error);
+          return;
+        }
+        setAllChat([...allChat, data]);
+        setMessage("");
+        setImgUrl("");
       }
-      setAllChat([...allChat, data]);
-      setMessage("");
+      else{
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            receiverId: selectedChat.userId,
+            message,
+            img: "",
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          showToast("error", "Error in sending message", data.error);
+          return;
+        }
+        setAllChat([...allChat, data]);
+        setMessage("");
+        setImgUrl("");
+      }
     } catch (err) {
       showToast("error", "Error in sending message", err.message);
+    }finally{
+      setLoading(false);
+
     }
   }
   useEffect(() => {
@@ -166,36 +202,75 @@ const Chats = () => {
         </Flex>
         {allChat.map((chat) => (
           <React.Fragment key={chat._id}>
-            <Flex
-              justifyContent={
-                chat.sender === user._id ? "flex-end" : "flex-start"
-              }
-              mb={4}
-            >
-              {chat.sender !== user._id && (
-                <Avatar w={10} h={10} src={selectedChat.userProfilePic} />
-              )}
-              <Box
-                p={2}
-                ml={3}
-                mr={3}
-                bg={chat.sender === user._id ? "blue.300" : "gray.500"}
-                color={"white"}
-                rounded={5}
-                maxW={"70%"}
+            {chat.img ? (
+              <Flex
+                justifyContent={
+                  chat.sender === user._id ? "flex-end" : "flex-start"
+                }
+                mb={4}
               >
-                {chat.text}
-              </Box>
-              {chat.sender === user._id && (
-                <Avatar w={10} h={10} src={user.profilePic} />
-              )}
-            </Flex>
+                {chat.sender !== user._id && (
+                  <Avatar w={10} h={10} src={selectedChat.userProfilePic} />
+                )}
+                <Box
+                  p={1}
+                  ml={3}
+                  mr={3}
+                  bg={chat.sender === user._id ? "blue.300" : "gray.500"}
+                  color={"white"}
+                  rounded={5}
+                  maxW={"70%"}
+                >
+                  <Link to={chat.img} target="blank">
+                  <Image src={chat.img} />
+                  </Link>
+                </Box>
+                {chat.sender === user._id && (
+                  <Avatar w={10} h={10} src={user.profilePic} />
+                )}
+              </Flex>
+            ) : (
+              <Flex
+                justifyContent={
+                  chat.sender === user._id ? "flex-end" : "flex-start"
+                }
+                mb={4}
+              >
+                {chat.sender !== user._id && (
+                  <Avatar w={10} h={10} src={selectedChat.userProfilePic} />
+                )}
+                <Box
+                  p={2}
+                  ml={3}
+                  mr={3}
+                  bg={chat.sender === user._id ? "blue.300" : "gray.500"}
+                  color={"white"}
+                  rounded={5}
+                  maxW={"70%"}
+                >
+                  {chat.text}
+                </Box>
+                {chat.sender === user._id && (
+                  <Avatar w={10} h={10} src={user.profilePic} />
+                )}
+              </Flex>
+            )}
           </React.Fragment>
         ))}
       </Box>
 
       <Flex alignItems={"center"}>
-        <Box as={CiImageOn} w={9} h={9} color={"blue.500"} m={2} />
+        <Box
+          as={CiImageOn}
+          w={9}
+          h={9}
+          color={"blue.500"}
+          m={2}
+          onClick={() => {
+            imgRef.current.click();
+          }}
+        />
+        <Input type="file" ref={imgRef} hidden onChange={handleImg} />
         <Input
           m={3}
           placeholder="Type a message"
@@ -208,6 +283,31 @@ const Chats = () => {
         />
         <Box as={BsSend} w={9} h={8} color={"blue.400"} onClick={sendMessage} />
       </Flex>
+
+      <Modal blockScrollOnMount={false} isOpen={imgUrl} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Your Selected Image</ModalHeader>
+          <ModalCloseButton onClick={()=>{setImgUrl("")}}/>
+          <ModalBody>
+            <Image src={imgUrl} />
+          </ModalBody>
+
+          <ModalFooter>
+            {loading ? (
+              <Spinner size={"md"} />
+            ) : (
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={sendMessage}
+              >
+                Send
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
