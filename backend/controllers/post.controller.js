@@ -85,6 +85,7 @@ const likeUnlikePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         const userOfPostId = post.postedBy;
+        const userOfPost = await User.findById(userOfPostId);
         if(!post){
             return res.status(400).json({ error: "Post does not exist" });
         }
@@ -103,8 +104,9 @@ const likeUnlikePost = async (req, res) => {
             let newNoti = new Notification({
               userId: userOfPostId,
               message: `${user.username} liked your post`,
-              link: `${user.name}/post/${req.params.id}`,
+              link: `/${userOfPost.username}/post/${req.params.id}`,
               read: false,
+              image: user.profilePic,
             });
             await newNoti.save();
             res.status(200).json({ message: "Post liked successfully" });
@@ -120,6 +122,8 @@ const commentToPost = async (req, res) => {
     try {
         const {text} = req.body;
         const {id} = req.params;  //post Id
+        const postUserId = await Post.findById(id).postedBy;
+        const postUser = await User.findById(postUserId);
         const userId = req.user._id;
         const userProfilePic = req.user.profilePic;
         const username = req.user.username;
@@ -142,8 +146,9 @@ const commentToPost = async (req, res) => {
         await Notification.create({
           userId: post.postedBy,
           message: `${username} commented on your post`,
-          link: `${username}/post/${id}`,
+          link: `${postUser.username}/post/${id}`,
           read: false,
+          image: userProfilePic,
         });   
         res.status(200).json(post);
 
@@ -225,6 +230,7 @@ const likeUnlikeComment = async (req, res) => {
               message: `${req.user.username} liked your comment`,
               link: `${req.user.username}/post/${post._id}`,
               read: false,
+              image: req.user.profilePic,
             });
             res.status(200).json({ message: "Comment liked successfully", post});
         }

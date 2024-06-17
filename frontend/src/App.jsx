@@ -13,6 +13,7 @@ import UpdateProfile from "./pages/UpdateProfile";
 import SidebarWithHeader from "./components/SideBarWithHeader";
 import ChatPage from "./pages/ChatPage";
 import Chats from "./components/Chats";
+import NotificationPage from "./pages/NotificationPage";
 
 function App() {
 
@@ -90,6 +91,16 @@ function App() {
           element={
             user[0] ? (
               <SidebarWithHeader children={<Chats />} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/notification"
+          element={
+            user[0] ? (
+              <SidebarWithHeader children={<NotificationPage />} />
             ) : (
               <Navigate to="/auth" />
             )

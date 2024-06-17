@@ -61,7 +61,9 @@ const signupUser = async (req, res) => {
         await newUser.save();
         await Notification.create({
           userId: newUser._id,
-          message: "Welcome to Apprise",
+          message:
+            "Welcome to Apprise. You can update your profile from your account page.",
+          image: "https://res.cloudinary.com/dpcmozzzi/image/upload/v1718628548/o5jrsgxcbd6uuidojp33.png",
           link: "",
           read: false,
         }); 
@@ -156,7 +158,7 @@ const addRemoveFriend = async (req, res) => {
         else{
             await User.findByIdAndUpdate(req.user._id, { $push: { friends: id } });
             await User.findByIdAndUpdate(id, { $push: { friends: req.user._id } });
-            await Notification.create({userId: id, message: `${weAsUser.username} added you as friend`, link: `/profile/${weAsUser.username}`, read: false});
+            await Notification.create({userId: id, message: `${weAsUser.username} added you as friend`, link: `/profile/${weAsUser.username}`, read: false, image: weAsUser.profilePic});
             res.status(200).json({ message: "Friend added" });
         }
 

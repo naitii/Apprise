@@ -11,4 +11,15 @@ const getNotifications = async (req, res) => {
     }
 };
 
-export { getNotifications };
+const markNotificationsAsRead = async (req, res) => {
+    try {
+        const id = req.params.id;
+        await Notification.updateMany({ userId: id }, { $set: { read: true } });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
+export { getNotifications, markNotificationsAsRead };

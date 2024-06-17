@@ -18,6 +18,7 @@ import {
   useColorMode,
   Input,
   Spinner,
+  Badge,
 
 } from "@chakra-ui/react";
 import {
@@ -40,7 +41,7 @@ import useShowToast from "../hooks/showToast";
 const LinkItems = [
   { name: "Home", icon: IoHomeOutline, href: "/"},
   { name: "Chat", icon: IoChatbubbleEllipsesOutline, href: "/chat" },
-  { name: "Notification", icon: IoIosNotificationsOutline },
+  { name: "Notification", icon: IoIosNotificationsOutline, href: "/notification"},
 ];
 
 export default function SidebarWithHeader({ children }) {
@@ -174,6 +175,27 @@ const MobileNav = ({ onOpen, ...rest }) => {
     const showToast = useShowToast();
     const [loading, setLoading] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isNotification, setIsNotification] = useState(false);
+
+    useEffect(() => {
+      const getNotifications = async () => {
+        try {
+          const res = await fetch(`/api/notification/${currentUser._id}`);
+          const data = await res.json();
+          if (data.error) {
+            showToast("Error", data.error, "error");
+            return;
+          }
+          console.log(data);
+          if(data[0]?.read === false){
+            setIsNotification(true);
+          }
+        } catch (err) {
+          showToast("Error", err.message, "error");
+        }
+      };
+      getNotifications();
+    },[]);
 
     useEffect(() => {
       if(window.innerWidth<800){
@@ -207,7 +229,6 @@ const MobileNav = ({ onOpen, ...rest }) => {
       }finally{
         setLoading(false);
       }
-
     }
 
   return (
@@ -347,19 +368,19 @@ const MobileNav = ({ onOpen, ...rest }) => {
               <VStack
                 position={"absolute"}
                 zIndex={10}
-                top={10}
+                top={24}
                 bg={useColorModeValue("white", "#1e1e1e")}
                 rounded={15}
                 alignItems={"center"}
                 w={["100%", "75%"]}
               >
-                <Spinner size={4} />
+                <Spinner size={20} />
               </VStack>
             )}
             <VStack
               position={"absolute"}
               zIndex={10}
-              top={10}
+              top={24}
               bg={useColorModeValue("white", "#1e1e1e")}
               rounded={15}
               alignItems={"flex-start"}
@@ -398,12 +419,19 @@ const MobileNav = ({ onOpen, ...rest }) => {
       )}
 
       <HStack spacing={{ base: "0", md: "6" }}>
+        <Link to="/notification">
+        <Box position={"relative"}>
         <IconButton
           size="lg"
           variant="ghost"
           aria-label="open menu"
+          onClick={() => setIsNotification(false)}
           icon={<FiBell />}
-        />
+          />
+         {isNotification && <Box position={"absolute"} top={2} right={2} bg={"red.300"} h={"10px"} w={"10px"} rounded={100}/>}
+        </Box>
+        
+        </Link>
         <Link to={`/profile/${currentUser.username}`}>
           <Flex alignItems={"center"}>
             <Menu>
