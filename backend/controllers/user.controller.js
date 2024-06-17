@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import generateTokensAndSetCookies from "../utils/helpers/generateTokensAndSetCookies.js";
 import {v2 as cloudinary} from "cloudinary";
 import mongoose from "mongoose";
+import Notification from "../models/notification.model.js";
 
 const getUserProfile = async (req, res) => {
     const {query} = req.params;
@@ -58,6 +59,12 @@ const signupUser = async (req, res) => {
             password: hashedPassword,
         });
         await newUser.save();
+        await Notification.create({
+          userId: newUser._id,
+          message: "Welcome to Apprise",
+          link: "",
+          read: false,
+        }); 
 
         if(newUser){
             generateTokensAndSetCookies(newUser._id, res);
@@ -149,6 +156,7 @@ const addRemoveFriend = async (req, res) => {
         else{
             await User.findByIdAndUpdate(req.user._id, { $push: { friends: id } });
             await User.findByIdAndUpdate(id, { $push: { friends: req.user._id } });
+            await Notification.create({userId: id, message: `${weAsUser.username} added you as friend`, link: `/profile/${weAsUser.username}`, read: false});
             res.status(200).json({ message: "Friend added" });
         }
 

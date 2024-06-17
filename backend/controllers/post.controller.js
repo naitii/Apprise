@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Notification from "../models/notification.model.js";
 import {v2 as cloudinary} from "cloudinary";
 import Post from "../models/post.model.js";
 
@@ -83,6 +84,7 @@ const deletePosts = async (req, res) => {
 const likeUnlikePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
+        const userOfPostId = post.postedBy;
         if(!post){
             return res.status(400).json({ error: "Post does not exist" });
         }
@@ -98,6 +100,13 @@ const likeUnlikePost = async (req, res) => {
         }
         else{
             await Post.updateOne({_id: req.params.id}, {$push: {likes: req.user._id}});
+            let newNoti = new Notification({
+              userId: userOfPostId,
+              message: `${user.username} liked your post`,
+              link: `${user.name}/post/${req.params.id}`,
+              read: false,
+            });
+            await newNoti.save();
             res.status(200).json({ message: "Post liked successfully" });
         }
 
@@ -130,6 +139,12 @@ const commentToPost = async (req, res) => {
         post.comments.push(newComment);
 
         await post.save();
+        await Notification.create({
+          userId: post.postedBy,
+          message: `${username} commented on your post`,
+          link: `${username}/post/${id}`,
+          read: false,
+        });   
         res.status(200).json(post);
 
     } catch (err) {
@@ -205,6 +220,12 @@ const likeUnlikeComment = async (req, res) => {
         }
         else{
             await Post.updateOne({"comments._id": commentId}, {$push: {"comments.$.likes": userId}});
+            await Notification.create({
+              userId: comment.userId,
+              message: `${req.user.username} liked your comment`,
+              link: `${req.user.username}/post/${post._id}`,
+              read: false,
+            });
             res.status(200).json({ message: "Comment liked successfully", post});
         }
         await post.save();

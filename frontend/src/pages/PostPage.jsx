@@ -44,13 +44,13 @@ const PostPage = () => {
         const res = await fetch(`/api/posts/${pid}`);
         const data = await res.json();
         if (data.error) {
-          showToast("Error -3", data.error, "error");
+          showToast("Error", data.error, "error");
         }
         setPosts(data);
         
         setSortedComments(data.comments.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt))));
       } catch (err) {
-        showToast("Error -4", err.message, "error");
+        showToast("Error", err.message, "error");
       }finally{
         setLoading2(false);
       
