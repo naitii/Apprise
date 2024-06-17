@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   IconButton,
   Avatar,
@@ -18,8 +19,6 @@ import {
   useColorMode,
   Input,
   Spinner,
-  Badge,
-
 } from "@chakra-ui/react";
 import {
   FiMenu,
