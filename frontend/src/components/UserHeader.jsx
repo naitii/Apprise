@@ -16,6 +16,7 @@ const UserHeader = ({ user }) => {
   const showToast = useShowToast();
   const [totalFriends, setTotalFriends] = useState(user.friends.length);
   const [postCount, setPostCount] = useState(0);
+  
 
     useEffect(() => {
 
@@ -153,7 +154,7 @@ const UserHeader = ({ user }) => {
           Friends: {totalFriends}
         </Text>
         <MessageSquareMore
-          // color={colorMode === "light" ? "#0cbf06" : "#9c7945"}
+          onClick={()=>{window.location.href=`/chat`}}
           size={28}
           cursor={"pointer"}
         />
