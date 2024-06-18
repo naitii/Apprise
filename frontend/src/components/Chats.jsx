@@ -39,6 +39,14 @@ const Chats = () => {
           element.scrollTop = element.scrollHeight;
    });
 
+
+   const handleKeyDown = (e) => {
+     if (e.key === "Enter") {
+       sendMessage();
+
+     }
+   };
+
   const sendMessage = async () => {
     if(message.trim() === "" && !imgUrl) return;
     if(loading) return;
@@ -222,7 +230,7 @@ const Chats = () => {
                   maxW={"70%"}
                 >
                   <Link to={chat.img} target="blank">
-                  <Image src={chat.img} />
+                    <Image src={chat.img} />
                   </Link>
                 </Box>
                 {chat.sender === user._id && (
@@ -279,6 +287,7 @@ const Chats = () => {
           borderColor={useColorModeValue("gray.500", "gray.700")}
           _hover={"none"}
           value={message}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setMessage(e.target.value)}
         />
         <Box as={BsSend} w={9} h={8} color={"blue.400"} onClick={sendMessage} />
@@ -288,7 +297,11 @@ const Chats = () => {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Your Selected Image</ModalHeader>
-          <ModalCloseButton onClick={()=>{setImgUrl("")}}/>
+          <ModalCloseButton
+            onClick={() => {
+              setImgUrl("");
+            }}
+          />
           <ModalBody>
             <Image src={imgUrl} />
           </ModalBody>
@@ -297,11 +310,7 @@ const Chats = () => {
             {loading ? (
               <Spinner size={"md"} />
             ) : (
-              <Button
-                colorScheme="blue"
-                mr={3}
-                onClick={sendMessage}
-              >
+              <Button colorScheme="blue" mr={3} onClick={sendMessage}>
                 Send
               </Button>
             )}
