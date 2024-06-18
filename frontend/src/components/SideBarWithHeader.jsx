@@ -123,7 +123,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
       >
         Toggle Theme
       </NavItem>
-      <NavItem position={"fixed"} bottom={"5"}>
+      <NavItem position={"fixed"} bottom={"12"}>
         <LogoutBtn />
       </NavItem>
     </Box>
@@ -354,7 +354,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
           </Link>
           <HStack w={"75%"} position={"relative"} h={"100%"}>
             <Input
-              placeholder="Search Friends"
+              placeholder="Search Users"
               display={"flex"}
               bg={useColorModeValue("gray.200", "#1e1e1e")}
               rounded={20}

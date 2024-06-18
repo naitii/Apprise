@@ -15,7 +15,7 @@ const UserPage = () => {
   const {username} = useParams();
   const showToast = useShowToast();
   const [posts, setPosts] = useRecoilState(postsAtom);
-  const [postCount, setPostCount] = useState(0);
+
 
   useEffect(()=>{
     const fetchUser =async ()=>{
@@ -44,7 +44,6 @@ const UserPage = () => {
         showToast("Error",data.error,"error");
       }
       setPosts(data);
-      setPostCount(data.length);
       }
      catch (err) {
       showToast("Error",err.message,"error");
@@ -68,7 +67,7 @@ const UserPage = () => {
   if(!postLoading && !posts?.length){
     return (
       <>
-        <UserHeader user={user} post={postCount}/>
+        <UserHeader user={user} />
         <Flex justify="center" align="center" h={"50vh"}>
           <Text fontSize={"xl"}>No posts yet</Text>
         </Flex>
@@ -78,7 +77,7 @@ const UserPage = () => {
 
   return (
     <div>
-      <UserHeader user={user} post={postCount}/>
+      <UserHeader user={user} />
       {postLoading && (
         <Flex justify="center" align="center" h={"100vh"}>
           <Spinner size={"xl"}/>

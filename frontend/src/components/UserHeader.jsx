@@ -4,10 +4,10 @@ import {CgMoreO} from "react-icons/cg";
 import {  useRecoilValue } from "recoil";
 import userAtom from "../atoms/user.atom";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useShowToast from "../hooks/showToast";
 
-const UserHeader = ({ user, postCount }) => {
+const UserHeader = ({ user }) => {
   const currentUser = useRecoilValue(userAtom);
   const [friend, setFriend] = useState(
     user.friends.includes(currentUser._id) ? true : false
@@ -15,6 +15,26 @@ const UserHeader = ({ user, postCount }) => {
   // console.log(friend);
   const showToast = useShowToast();
   const [totalFriends, setTotalFriends] = useState(user.friends.length);
+  const [postCount, setPostCount] = useState(0);
+
+    useEffect(() => {
+
+      const getPost = async () => {
+        try {
+          const res = await fetch(`/api/posts/user/${user?.username}`);
+          const data = await res.json();
+          if (data.error) {
+            showToast("Error", data.error, "error");
+          }
+          setPostCount(data.length);
+        } catch (err) {
+          showToast("Error", err.message, "error");
+        } 
+      };
+      getPost();
+    }, [user.username, showToast]);
+
+
 
   const handleFriendship = async () => {
     try {

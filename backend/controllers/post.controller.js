@@ -121,9 +121,7 @@ const likeUnlikePost = async (req, res) => {
 const commentToPost = async (req, res) => {
     try {
         const {text} = req.body;
-        const {id} = req.params;  //post Id
-        const postUserId = await Post.findById(id).postedBy;
-        const postUser = await User.findById(postUserId);
+        const {id} = req.params;
         const userId = req.user._id;
         const userProfilePic = req.user.profilePic;
         const username = req.user.username;
@@ -131,6 +129,8 @@ const commentToPost = async (req, res) => {
             return res.status(400).json({ error: "Please fill all the fields" });
         }
         const post = await Post.findById(id);
+        const userPost = await User.findById(post.postedBy);
+
         if(!post){
             return res.status(400).json({ error: "Post does not exist" });
         }
@@ -146,7 +146,7 @@ const commentToPost = async (req, res) => {
         await Notification.create({
           userId: post.postedBy,
           message: `${username} commented on your post`,
-          link: `${postUser.username}/post/${id}`,
+          link: `/${userPost?.username}/post/${id}`,
           read: false,
           image: userProfilePic,
         });   
@@ -228,7 +228,7 @@ const likeUnlikeComment = async (req, res) => {
             await Notification.create({
               userId: comment.userId,
               message: `${req.user.username} liked your comment`,
-              link: `${req.user.username}/post/${post._id}`,
+              link: `/${req.user.username}/post/${post._id}`,
               read: false,
               image: req.user.profilePic,
             });
