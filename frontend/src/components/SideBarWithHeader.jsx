@@ -432,7 +432,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
         
         </Link>
         <Link to={`/profile/${currentUser.username}`}>
-          <Flex alignItems={"center"}>
+          <Flex alignItems={"center"} minW={"fit-content"}>
             <Menu>
               <MenuButton
                 py={2}
@@ -445,7 +445,8 @@ const MobileNav = ({ onOpen, ...rest }) => {
                     display={{ base: "none", md: "flex" }}
                     alignItems="flex-start"
                     spacing="1px"
-                    ml="2"
+                    minW={"fit-content"}
+                    ml="1"
                   >
                     <Text fontSize="sm">{currentUser.name}</Text>
                     <Text fontSize="xs" color="gray.600">
