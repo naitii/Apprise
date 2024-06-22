@@ -7,7 +7,6 @@ Welcome to Apprise, a dynamic social media platform designed to bring people tog
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Usage](#usage)
-4. [Deployement](#deployment)
 
 ## Features
 
@@ -92,8 +91,5 @@ Once the server and frontend are running, you can start using Apprise by navigat
 6. **Manage Friends**:
    - You can add friends or remove your existing friends.Added friend will be notified for the same.
   
-## Deployment
-
-Apprise is deployed and accessible online. You can visit the deployed site at [Apprise](https://apprise-g8yj.onrender.com).
 
     
