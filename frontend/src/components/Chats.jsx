@@ -43,7 +43,6 @@ const Chats = () => {
    const handleKeyDown = (e) => {
      if (e.key === "Enter") {
        sendMessage();
-
      }
    };
 
@@ -104,7 +103,7 @@ const Chats = () => {
   useEffect(() => {
     // if(socket){
     socket?.on("newChat", (data) => {
-      console.log("new chat data: ",selectedChat._id, data?.convoId);
+      console.log("new chat data: ", selectedChat._id === data?.convoId);
       if(selectedChat._id.toString() === data?.convoId.toString()){
         setAllChat((prevChat) => [...prevChat, data]);
         const element = document.getElementById("messageContainer");

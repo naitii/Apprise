@@ -16,13 +16,13 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (user?._id) {
-      const socketInstance = io("/", {
+      const socketInstance = io("http://localhost:5000", {
         query: {
           userId: user._id,
         },
       });
       setSocket(socketInstance);
-
+      socketInstance.on("connect", () => {console.log("connected")});
       return () => {
         socketInstance.disconnect();
       };
